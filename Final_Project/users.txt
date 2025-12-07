@@ -1,3 +1,5 @@
-hieu 123 user
-hieu2 123 user
-dat 123 user
+dat 123456 admin
+ngoctran 111111 user
+chien 234567 user
+user 123123 user
+admin 123123 admin

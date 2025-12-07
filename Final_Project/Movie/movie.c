@@ -1,59 +1,145 @@
 #define _GNU_SOURCE
 
 #include "movie.h"
+#include "protocol.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <strings.h>
+#include <ctype.h>
 
 extern Movie movie_cache[100];
 extern int movie_count;
 
+// --- CÁC HÀM TIỆN ÍCH (HELPER FUNCTIONS) ---
 
-int find_movie_by_title(const char *title) {
-    for (int i = 0; i < movie_count; i++) {
-        printf("Searching for title: %s\n", title);
-        printf("Comparing with movie: %s\n", movie_cache[i].title);
-        if (strcmp(movie_cache[i].title, title) == 0)
-            return i;
+// Hàm trả về 1 nếu giống nhau(không phân biệt hoa thường), trả về 0 nếu khác nhau
+int string_equals_ignore_case(const char *s1, const char *s2)
+{
+    while (*s1 && *s2)
+    {
+        // So sánh từng ký tự sau khi chuyển về chữ thường
+        if (tolower((unsigned char)*s1) != tolower((unsigned char)*s2))
+        {
+            return 0; // Khác nhau
+        }
+        s1++;
+        s2++;
     }
+    // Kiểm tra xem cả 2 chuỗi đã kết thúc cùng lúc chưa (độ dài bằng nhau)
+    return *s1 == *s2;
+}
+
+// Hàm xóa khoảng trắng đầu và cuối chuỗi
+void trim(char *s)
+{
+    char *p = s;
+    int l = strlen(p);
+
+    while (l > 0 && isspace(p[l - 1]))
+        p[--l] = 0;
+    while (*p && isspace(*p))
+        ++p, --l;
+
+    memmove(s, p, l + 1);
+}
+
+// Hàm tìm chuỗi con không phân biệt hoa thường
+char *stristr(const char *haystack, const char *needle)
+{
+    if (!*needle)
+        return (char *)haystack;
+    for (; *haystack; ++haystack)
+    {
+        if (tolower((unsigned char)*haystack) == tolower((unsigned char)*needle))
+        {
+            const char *h, *n;
+            for (h = haystack, n = needle; *h && *n; ++h, ++n)
+            {
+                if (tolower((unsigned char)*h) != tolower((unsigned char)*n))
+                    break;
+            }
+            if (!*n)
+                return (char *)haystack;
+        }
+    }
+    return NULL;
+}
+
+// Hàm ánh xạ ngày (Thứ 2 -> index 0) - Không phân biệt hoa thường
+int map_day_to_index(const char *day)
+{
+    if (strcasecmp(day, "Thứ 2") == 0)
+        return 0;
+    if (strcasecmp(day, "Thứ 3") == 0)
+        return 1;
+    if (strcasecmp(day, "Thứ 4") == 0)
+        return 2;
+    if (strcasecmp(day, "Thứ 5") == 0)
+        return 3;
+    if (strcasecmp(day, "Thứ 6") == 0)
+        return 4;
+    if (strcasecmp(day, "Thứ 7") == 0)
+        return 5;
+    if (strcasecmp(day, "Chủ nhật") == 0)
+        return 6;
     return -1;
 }
 
-
-int find_time_slot(int movie_index, int day_index, const char *time) {
-    for (int i = 0; i < MAX_SLOTS; i++) {
-        if (strcmp(movie_cache[movie_index].schedule[day_index][i], time) == 0)
-            return i;
-    }
-    return -1;
-}
-
-
-
-void normalize_time(char *out, const char *in) {
+// Hàm chuẩn hóa giờ (ví dụ "7" -> "07h")
+void normalize_time(char *out, const char *in)
+{
     int hour;
-    if (sscanf(in, "%dh", &hour) == 1) {
-        sprintf(out, "%02dh", hour);  // pad with leading zero
-    } else {
-        out[0] = '\0';  // fallback if input is invalid
+    if (sscanf(in, "%dh", &hour) == 1)
+    {
+        sprintf(out, "%02dh", hour);
+    }
+    else
+    {
+        out[0] = '\0';
     }
 }
 
+// --- CÁC HÀM TÌM KIẾM CORE ---
 
-int map_day_to_index(const char *day) {
-    if (strcmp(day, "Thứ 2") == 0) return 0;
-    if (strcmp(day, "Thứ 3") == 0) return 1;
-    if (strcmp(day, "Thứ 4") == 0) return 2;
-    if (strcmp(day, "Thứ 5") == 0) return 3;
-    if (strcmp(day, "Thứ 6") == 0) return 4;
-    if (strcmp(day, "Thứ 7") == 0) return 5;
-    if (strcmp(day, "Chủ nhật") == 0) return 6;
+int find_movie_by_title(const char *title)
+{
+    for (int i = 0; i < movie_count; i++)
+    {
+        // SỬA: Dùng hàm mới thay vì strcmp
+        if (string_equals_ignore_case(movie_cache[i].title, title))
+        {
+            return i; // Tìm thấy
+        }
+    }
+    return -1; // Không tìm thấy
+}
+
+int find_time_slot(int movie_index, int day_index, const char *time)
+{
+    int u_time = atoi(time); // Chuyển input user thành số (vd: "7" -> 7)
+    for (int i = 0; i < MAX_SLOTS; i++)
+    {
+        char *db_time_str = movie_cache[movie_index].schedule[day_index][i];
+        if (strlen(db_time_str) == 0)
+            continue;
+
+        int db_time = atoi(db_time_str); // Chuyển giờ DB thành số (vd: "7h" -> 7)
+        if (db_time == u_time)
+        {
+            return i;
+        }
+    }
     return -1;
 }
 
-int load_movies(const char *filename, Movie *movies, int max_movies) {
+// --- CÁC HÀM FILE I/O ---
+
+int load_movies(const char *filename, Movie *movies, int max_movies)
+{
     FILE *fp = fopen(filename, "r");
-    if (!fp) {
+    if (!fp)
+    {
         perror("Cannot open file");
         return 0;
     }
@@ -61,21 +147,18 @@ int load_movies(const char *filename, Movie *movies, int max_movies) {
     char line[1024];
     int count = 0;
 
-    while (fgets(line, sizeof(line), fp) && count < max_movies) {
-        // Remove trailing newline
+    while (fgets(line, sizeof(line), fp) && count < max_movies)
+    {
         line[strcspn(line, "\r\n")] = '\0';
 
-        // Top-level tokenization
         char *saveptr1;
         char *title = strtok_r(line, "|", &saveptr1);
         char *genre = strtok_r(NULL, "|", &saveptr1);
         char *duration_str = strtok_r(NULL, "|", &saveptr1);
-        char *schedule_str = strtok_r(NULL, "", &saveptr1); // rest of line
+        char *schedule_str = strtok_r(NULL, "", &saveptr1);
 
-        if (!title || !genre || !duration_str || !schedule_str) {
-            fprintf(stderr, "Skipping malformed line: %s\n", line);
+        if (!title || !genre || !duration_str || !schedule_str)
             continue;
-        }
 
         strncpy(movies[count].title, title, sizeof(movies[count].title) - 1);
         strncpy(movies[count].genre, genre, sizeof(movies[count].genre) - 1);
@@ -83,248 +166,622 @@ int load_movies(const char *filename, Movie *movies, int max_movies) {
         movies[count].genre[sizeof(movies[count].genre) - 1] = '\0';
         movies[count].duration = atoi(duration_str);
 
-        // Clear schedule
+        // Reset schedule & seatmap
         for (int d = 0; d < MAX_DAYS; d++)
+        {
             for (int s = 0; s < MAX_SLOTS; s++)
+            {
                 movies[count].schedule[d][s][0] = '\0';
+                // Mặc định ghế trống (' ')
+                memset(movies[count].seatmap[d][s], ' ', sizeof(movies[count].seatmap[d][s]));
+            }
+        }
 
-        // Copy schedule_str to safely tokenize
         char schedule_copy[800];
         strncpy(schedule_copy, schedule_str, sizeof(schedule_copy) - 1);
         schedule_copy[sizeof(schedule_copy) - 1] = '\0';
 
         char *saveptr2;
         char *day_block = strtok_r(schedule_copy, ";", &saveptr2);
-        while (day_block) {
+        while (day_block)
+        {
             char *saveptr3;
             char *day = strtok_r(day_block, ":", &saveptr3);
-            char *times = strtok_r(NULL, "", &saveptr3); // rest of block
+            char *times = strtok_r(NULL, "", &saveptr3);
 
-            if (day && times) {
+            if (day && times)
+            {
                 int day_index = map_day_to_index(day);
-                if (day_index >= 0 && day_index < MAX_DAYS) {
+                if (day_index >= 0 && day_index < MAX_DAYS)
+                {
                     int slot = 0;
                     char *saveptr4;
                     char *time = strtok_r(times, ",", &saveptr4);
-                    while (time && slot < MAX_SLOTS) {
-                        strncpy(movies[count].schedule[day_index][slot],
-                                time,
-                                sizeof(movies[count].schedule[day_index][slot]) - 1);
-                        movies[count].schedule[day_index][slot][sizeof(movies[count].schedule[day_index][slot]) - 1] = '\0';
+                    while (time && slot < MAX_SLOTS)
+                    {
+                        strncpy(movies[count].schedule[day_index][slot], time, 9);
+                        movies[count].schedule[day_index][slot][9] = '\0';
                         slot++;
                         time = strtok_r(NULL, ",", &saveptr4);
                     }
                 }
             }
-
             day_block = strtok_r(NULL, ";", &saveptr2);
         }
-
         count++;
     }
-
     fclose(fp);
     return count;
 }
 
-int save_movie(const char *filename, const Movie *movie) {
-    FILE *fp = fopen(filename, "a");
-    if (!fp) return 0;
+int save_all_movies(const char *filename)
+{
+    FILE *fp = fopen(filename, "w");
+    if (!fp)
+        return 0;
 
-    fprintf(fp, "%s|%s|%d|", movie->title, movie->genre, movie->duration);
+    for (int i = 0; i < movie_count; i++)
+    {
+        Movie *m = &movie_cache[i];
+        fprintf(fp, "%s|%s|%d|", m->title, m->genre, m->duration);
 
-    for (int d = 0; d < MAX_DAYS; d++) {
-        int has_day = 0;
-        for (int s = 0; s < MAX_SLOTS; s++) {
-            if (strlen(movie->schedule[d][s]) > 0) {
-                if (!has_day) {
-                    fprintf(fp, "%s:", d == 0 ? "Thứ 2" :
-                                        d == 1 ? "Thứ 3" :
-                                        d == 2 ? "Thứ 4" :
-                                        d == 3 ? "Thứ 5" :
-                                        d == 4 ? "Thứ 6" :
-                                        d == 5 ? "Thứ 7" : "Chủ nhật");
-                    has_day = 1;
+        int has_schedule = 0;
+        for (int d = 0; d < MAX_DAYS; d++)
+        {
+            int has_day = 0;
+            for (int s = 0; s < MAX_SLOTS; s++)
+            {
+                if (strlen(m->schedule[d][s]) > 0)
+                {
+                    if (!has_day)
+                    {
+                        if (has_schedule)
+                            fprintf(fp, ";");
+                        fprintf(fp, "%s:", d == 0 ? "Thứ 2" : d == 1 ? "Thứ 3"
+                                                          : d == 2   ? "Thứ 4"
+                                                          : d == 3   ? "Thứ 5"
+                                                          : d == 4   ? "Thứ 6"
+                                                          : d == 5   ? "Thứ 7"
+                                                                     : "Chủ Nhật");
+                        has_day = 1;
+                        has_schedule = 1;
+                    }
+                    else
+                    {
+                        fprintf(fp, ",");
+                    }
+                    fprintf(fp, "%s", m->schedule[d][s]);
                 }
-                fprintf(fp, "%s,", movie->schedule[d][s]);
             }
         }
-        if (has_day) fprintf(fp, ";");
+        fprintf(fp, "\n");
     }
-
-    fprintf(fp, "\n");
     fclose(fp);
     return 1;
 }
-#include "movie.h"
-#include <string.h>
 
-void handle_list_movies(char *response_out) {
+// --- CÁC HÀM XỬ LÝ (HANDLERS) ---
+
+void handle_list_movies(char *response_out)
+{
     strcpy(response_out, "");
-    for (int i = 0; i < movie_count; i++) {
+    for (int i = 0; i < movie_count; i++)
+    {
         char line[256];
         sprintf(line, "Title: %s\nGenre: %s\nDuration: %d mins\n\n",
                 movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
-        strcat(response_out, line);
+        if (strlen(response_out) + strlen(line) < MAXLINE)
+            strcat(response_out, line);
     }
 }
 
-void handle_search(const char *payload, char *response_out) {
+void handle_search(const char *payload, char *response_out)
+{
     char title[MAX_TITLE];
-    sscanf(payload, "SEARCH title=%s", title);
+    sscanf(payload, "SEARCH title=%[^\n]", title);
 
-    for (int i = 0; i < movie_count; i++) {
-        if (strcmp(movie_cache[i].title, title) == 0) {
-            sprintf(response_out, "Title: %s\nGenre: %s\nDuration: %d mins\n",
+    strcpy(response_out, "");
+    int found_count = 0;
+
+    for (int i = 0; i < movie_count; i++)
+    {
+        if (stristr(movie_cache[i].title, title) != NULL)
+        {
+            char match_info[MAXLINE];
+            sprintf(match_info, "Title: %s\nGenre: %s\nDuration: %d mins\n\n",
                     movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
-            return;
+            if (strlen(response_out) + strlen(match_info) < MAXLINE)
+            {
+                strcat(response_out, match_info);
+                found_count++;
+            }
         }
     }
-    strcpy(response_out, "NOT_FOUND");
+    if (found_count == 0)
+    {
+        strcpy(response_out, "NOT_FOUND");
+    }
 }
 
-void handle_list_genres(char *response_out) {
+void handle_list_genres(char *response_out)
+{
     char genres[100][MAX_GENRE];
     int count = 0;
     strcpy(response_out, "");
 
-    for (int i = 0; i < movie_count; i++) {
-        int found = 0;
-        for (int j = 0; j < count; j++) {
-            if (strcmp(genres[j], movie_cache[i].genre) == 0) {
-                found = 1;
-                break;
+    for (int i = 0; i < movie_count; i++)
+    {
+        char temp_genre[MAX_GENRE];
+        strcpy(temp_genre, movie_cache[i].genre);
+        char *token = strtok(temp_genre, ",");
+        while (token != NULL)
+        {
+            trim(token);
+            int found = 0;
+            for (int j = 0; j < count; j++)
+            {
+                if (strcmp(genres[j], token) == 0)
+                {
+                    found = 1;
+                    break;
+                }
             }
-        }
-        if (!found) {
-            strcpy(genres[count++], movie_cache[i].genre);
+            if (!found)
+            {
+                strcpy(genres[count++], token);
+            }
+            token = strtok(NULL, ",");
         }
     }
-
-    for (int i = 0; i < count; i++) {
-        strcat(response_out, genres[i]);
-        strcat(response_out, "\n");
+    for (int i = 0; i < count; i++)
+    {
+        if (strlen(response_out) + strlen(genres[i]) + 2 < MAXLINE)
+        {
+            strcat(response_out, genres[i]);
+            strcat(response_out, "\n");
+        }
     }
 }
 
-void handle_filter_genre(const char *payload, char *response_out) {
+void handle_filter_genre(const char *payload, char *response_out)
+{
     char genre[MAX_GENRE];
     sscanf(payload, "FILTER_GENRE genre=\"%[^\"]\"", genre);
+
     printf("Filtering genre: %s\n", genre);
     strcpy(response_out, "");
-
-    for (int i = 0; i < movie_count; i++) {
-        if (strcmp(movie_cache[i].genre, genre) == 0) {
-            printf("Matched movie: %s\n", movie_cache[i].title);
-            char line[256];
+    int found_count = 0;
+    for (int i = 0; i < movie_count; i++)
+    {
+        if (stristr(movie_cache[i].genre, genre) != NULL)
+        {
+            char line[MAXLINE];
             sprintf(line, "Title: %s\nDuration: %d mins\n\n",
                     movie_cache[i].title, movie_cache[i].duration);
-            strcat(response_out, line);
-        }
-    }
-}
 
-void handle_filter_time(const char *payload, char *response_out) {
-    char day[10], begin[10], end[10];
-    int day_index;
-    sscanf(payload, "FILTER_TIME day=\"%[^\"]\" begin=%s end=%s", day, begin, end);
-    strcpy(response_out, "");
-    printf("Filtering time on day: %s from %s to %s\n", day, begin, end);
-    day_index = map_day_to_index(day);
-    for (int i = 0; i < movie_count; i++) {
-        for (int s = 0; s < MAX_SLOTS; s++) {
-            char *time = movie_cache[i].schedule[day_index][s];
-            printf("Checking movie: %s, time: %s\n", movie_cache[i].title, time);
-            if (strlen(time) == 0) continue;
-            char norm_time[10], norm_begin[10], norm_end[10];
-            normalize_time(norm_time, time);
-            normalize_time(norm_begin, begin);
-            normalize_time(norm_end, end);
-            printf("Normalized times - movie: %s, begin: %s, end: %s\n", norm_time, norm_begin, norm_end);
-            if (strcmp(norm_time, norm_begin) >= 0 && strcmp(norm_time, norm_end) <= 0) {
-                char line[256];
-                printf("Matched movie: %s at time: %s\n", movie_cache[i].title, time);
-                sprintf(line, "Title: %s\nTime: %s\n\n", movie_cache[i].title, time);
+            if (strlen(response_out) + strlen(line) < MAXLINE)
+            {
                 strcat(response_out, line);
-                printf("Added to response: %s\n", line);
+                found_count++;
             }
-
         }
+    }
+    if (found_count == 0)
+    {
+        strcpy(response_out, "No movies found for this genre.");
     }
 }
 
-void handle_get_seatmap(const char *payload, char *response_out) {
-    char title[MAX_TITLE], day[10], time[10];
+void handle_filter_time(const char *payload, char *response_out)
+{
+    char day[50], begin_str[10], end_str[10];
+
+    // Parse input
+    sscanf(payload, "FILTER_TIME day=\"%[^\"]\" begin=%s end=%s", day, begin_str, end_str);
+
+    int day_index = map_day_to_index(day);
+    if (day_index == -1)
+    {
+        sprintf(response_out, "Invalid day input: %s", day);
+        return;
+    }
+
+    int u_begin = atoi(begin_str);
+    int u_end = atoi(end_str);
+
+    printf("Filtering time: Day=%s, Range: %dh - %dh\n", day, u_begin, u_end);
+
+    strcpy(response_out, "");
+    int found_any_movie = 0;
+
+    for (int i = 0; i < movie_count; i++)
+    {
+        char time_list[MAXLINE] = "";
+        int found_slots = 0;
+        for (int s = 0; s < MAX_SLOTS; s++)
+        {
+            char *time_str = movie_cache[i].schedule[day_index][s];
+            if (strlen(time_str) == 0)
+                continue;
+            int m_start_h = atoi(time_str);
+            if (m_start_h >= u_begin && m_start_h <= u_end)
+            {
+                int duration = movie_cache[i].duration;
+                int m_end_h = m_start_h + (duration / 60);
+                int m_end_m = duration % 60;
+                char slot_info[50];
+                sprintf(slot_info, "%02dh00 - %02dh%02d", m_start_h, m_end_h, m_end_m);
+
+                if (found_slots > 0)
+                    strcat(time_list, ", ");
+                strcat(time_list, slot_info);
+
+                found_slots++;
+            }
+        }
+        if (found_slots > 0)
+        {
+            char movie_entry[MAXLINE];
+            sprintf(movie_entry, "Title: %s\nGenre: %s\nDuration: %d mins\nSchedule: %s\n\n",
+                    movie_cache[i].title,
+                    movie_cache[i].genre,
+                    movie_cache[i].duration,
+                    time_list);
+            if (strlen(response_out) + strlen(movie_entry) < MAXLINE)
+            {
+                strcat(response_out, movie_entry);
+                found_any_movie++;
+            }
+        }
+    }
+    if (found_any_movie == 0)
+    {
+        strcpy(response_out, "No movies found in this time range.");
+    }
+}
+
+void handle_get_seatmap(const char *payload, char *response_out)
+{
+    char title[MAX_TITLE], day[50], time[20];
+
+    // Parse input: hỗ trợ dấu ngoặc kép
     sscanf(payload, "GET_SEATMAP title=\"%[^\"]\" day=\"%[^\"]\" start=%s", title, day, time);
-    printf("Getting seatmap for movie: %s, day: %s", title, day);
+
     int movie_index = find_movie_by_title(title);
-    if (movie_index == -1) {
+    if (movie_index == -1)
+    {
         sprintf(response_out, "Movie not found: %s", title);
         return;
     }
 
     int day_index = map_day_to_index(day);
-    if (day_index < 0 || day_index >= MAX_DAYS) {
+    if (day_index < 0 || day_index >= MAX_DAYS)
+    {
         sprintf(response_out, "Invalid day: %s", day);
         return;
     }
 
     int time_index = find_time_slot(movie_index, day_index, time);
-    if (time_index == -1) {
+    if (time_index == -1)
+    {
         sprintf(response_out, "Time slot not found: %s", time);
         return;
     }
 
-    response_out[0] = '\0';
-    for (int r = 0; r < 3; r++) {
+    strcpy(response_out, "");
+    for (int r = 0; r < 3; r++)
+    {
         strcat(response_out, "|");
-        for (int c = 0; c < 5; c++) {
-            char seat[4];
-            sprintf(seat, "%s|", movie_cache[movie_index].seatmap[day_index][time_index][r][c] == 'x' ? "x" : " ");
+        for (int c = 0; c < 5; c++)
+        {
+            char seat[10];
+            sprintf(seat, "%c|", movie_cache[movie_index].seatmap[day_index][time_index][r][c] == 'x' ? 'x' : ' ');
             strcat(response_out, seat);
         }
         strcat(response_out, "\n");
     }
 }
 
-
-
-void handle_book_seat(const char *payload, char *response_out) {
+void handle_book_seat(const char *payload, char *response_out)
+{
     int row, col;
-    char title[MAX_TITLE], day[10], time[10];
+    char title[MAX_TITLE], day[50], time[20];
+
+    // Parse input: hỗ trợ dấu ngoặc kép
     sscanf(payload, "BOOK_SEAT title=\"%[^\"]\" day=\"%[^\"]\" time=%s row=%d col=%d",
            title, day, time, &row, &col);
 
     int movie_index = find_movie_by_title(title);
-    if (movie_index == -1) {
+    if (movie_index == -1)
+    {
         sprintf(response_out, "Movie not found: %s", title);
         return;
     }
 
     int day_index = map_day_to_index(day);
-    if (day_index < 0 || day_index >= MAX_DAYS) {
+    if (day_index < 0 || day_index >= MAX_DAYS)
+    {
         sprintf(response_out, "Invalid day: %s", day);
         return;
     }
 
     int time_index = find_time_slot(movie_index, day_index, time);
-    if (time_index == -1) {
+    if (time_index == -1)
+    {
         sprintf(response_out, "Time slot not found: %s", time);
         return;
     }
 
-    if (row < 1 || row > 3 || col < 1 || col > 5) {
-        sprintf(response_out, "Invalid seat position.");
+    if (row < 1 || row > 3 || col < 1 || col > 5)
+    {
+        sprintf(response_out, "Invalid seat position (Row 1-3, Col 1-5)");
         return;
     }
 
-    if (movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] == 'x') {
-        sprintf(response_out, "Seat (%d,%d) is already booked.", row, col);
+    if (movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] == 'x')
+    {
+        sprintf(response_out, "Failed: Seat (%d,%d) is already booked!", row, col);
         return;
     }
 
+    // Đặt ghế
     movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] = 'x';
-    sprintf(response_out, "Seat (%d,%d) booked for %s at %s %s", row, col, title, day, time);
+
+    // Lưu lại file
+    save_all_movies("movies.txt");
+
+    sprintf(response_out, "SUCCESS: Booked seat (%d,%d) for '%s' at %s %s",
+            row, col, movie_cache[movie_index].title, day, time);
 }
 
+// --- CÁC HÀM ADMIN (GIỮ LẠI CHO ĐẦY ĐỦ) ---
 
+void handle_add_movie(const char *payload, char *out)
+{
+    char title[100], genre[50];
+    int duration;
+
+    sscanf(payload, "ADD_MOVIE title=\"%[^\"]\" genre=\"%[^\"]\" duration=%d",
+           title, genre, &duration);
+
+    if (movie_count >= 100)
+    {
+        strcpy(out, "ERROR: Movie list full");
+        return;
+    }
+
+    Movie *m = &movie_cache[movie_count++];
+    strcpy(m->title, title);
+    strcpy(m->genre, genre);
+    m->duration = duration;
+
+    memset(m->schedule, 0, sizeof(m->schedule));
+    memset(m->seatmap, 0, sizeof(m->seatmap));
+
+    if (!save_all_movies("movies.txt"))
+    {
+        strcpy(out, "ERROR: Cannot save movie file");
+        return;
+    }
+
+    strcpy(out, "SUCCESS: Movie added");
+}
+
+void handle_delete_movie(const char *payload, char *out)
+{
+    char title[200];
+
+    // 1. Lấy tên phim từ payload
+    sscanf(payload, "DELETE_MOVIE title=\"%199[^\"]\"", title);
+
+    // 2. Tìm vị trí phim (Giờ đây nó đã hỗ trợ không phân biệt hoa thường)
+    int index = find_movie_by_title(title);
+
+    if (index < 0)
+    {
+        strcpy(out, "ERROR: Movie not found");
+        return;
+    }
+
+    // 3. Thực hiện xóa bằng cách dồn mảng
+    // Ví dụ: Mảng có [A, B, C, D], xóa B (index 1)
+    // Ta chép C đè lên B, D đè lên C -> [A, C, D]
+    for (int i = index; i < movie_count - 1; i++)
+    {
+        movie_cache[i] = movie_cache[i + 1];
+    }
+
+    // 4. Giảm số lượng phim và làm sạch phần tử cuối (để tránh rác)
+    movie_count--;
+    memset(&movie_cache[movie_count], 0, sizeof(Movie));
+
+    // 5. Lưu lại file
+    save_all_movies("movies.txt");
+
+    // 6. Thông báo thành công
+    // Gửi lại tên phim GỐC (trong danh sách) để user biết chính xác phim nào đã xóa
+    sprintf(out, "SUCCESS: Deleted movie");
+}
+
+void handle_update_movie(const char *payload, char *out)
+{
+    char title[100], new_genre[50];
+    int new_duration;
+    sscanf(payload,
+           "UPDATE_MOVIE title=\"%[^\"]\" new_genre=\"%[^\"]\" new_duration=%d",
+           title, new_genre, &new_duration);
+
+    int i = find_movie_by_title(title);
+    if (i < 0)
+    {
+        strcpy(out, "ERROR: Movie not found");
+        return;
+    }
+
+    strcpy(movie_cache[i].genre, new_genre);
+    movie_cache[i].duration = new_duration;
+    save_all_movies("movies.txt");
+
+    strcpy(out, "SUCCESS: Movie updated");
+}
+
+void handle_add_schedule(const char *payload, char *out)
+{
+    char title[100], day[20], time_list[200];
+
+    // Parse input: time nằm trong ngoặc kép (time="%[^"]")
+    sscanf(payload, "ADD_SCHEDULE title=\"%[^\"]\" day=\"%[^\"]\" time=\"%[^\"]\"",
+           title, day, time_list);
+
+    int movie_index = find_movie_by_title(title);
+    if (movie_index < 0)
+    {
+        strcpy(out, "ERROR: Movie not found");
+        return;
+    }
+
+    int di = map_day_to_index(day);
+    if (di < 0)
+    {
+        strcpy(out, "ERROR: Invalid day");
+        return;
+    }
+
+    Movie *m = &movie_cache[movie_index];
+    int added_count = 0;
+    int slots_full = 0;
+
+    // Tách chuỗi bằng dấu phẩy (ví dụ "9h, 14h, 19h")
+    char *token = strtok(time_list, ",");
+    while (token != NULL)
+    {
+        trim(token); // Xóa khoảng trắng thừa (ví dụ " 14h" -> "14h")
+
+        if (strlen(token) > 0)
+        {
+            int found_empty = 0;
+            // Tìm slot trống để nhét giờ vào
+            for (int i = 0; i < MAX_SLOTS; i++)
+            {
+                if (strlen(m->schedule[di][i]) == 0)
+                {
+                    strncpy(m->schedule[di][i], token, 9);
+                    m->schedule[di][i][9] = '\0'; // Đảm bảo null-terminated
+
+                    // Reset ghế cho suất chiếu mới này
+                    memset(m->seatmap[di][i], ' ', sizeof(m->seatmap[di][i]));
+
+                    found_empty = 1;
+                    added_count++;
+                    break;
+                }
+            }
+            if (!found_empty)
+                slots_full = 1;
+        }
+        token = strtok(NULL, ",");
+    }
+
+    if (added_count > 0)
+    {
+        save_all_movies("movies.txt");
+        if (slots_full)
+            sprintf(out, "SUCCESS: Added %d schedules (Warning: Some slots were full)", added_count);
+        else
+            sprintf(out, "SUCCESS: Added %d schedules", added_count);
+    }
+    else
+    {
+        strcpy(out, "ERROR: No schedules added (Slots full or invalid input)");
+    }
+}
+
+void handle_reset_seatmap(const char *payload, char *out)
+{
+    char title[100], day[20], time[10];
+    sscanf(payload, "RESET_SEATMAP title=\"%[^\"]\" day=\"%[^\"]\" time=%s",
+           title, day, time);
+
+    int mi = find_movie_by_title(title);
+    int di = map_day_to_index(day);
+    int ti = find_time_slot(mi, di, time);
+
+    if (mi >= 0 && di >= 0 && ti >= 0)
+    {
+        memset(movie_cache[mi].seatmap[di][ti], ' ', sizeof(movie_cache[mi].seatmap[di][ti]));
+        strcpy(out, "SUCCESS: Seatmap reset");
+    }
+    else
+    {
+        strcpy(out, "ERROR: Slot not found");
+    }
+}
+
+void handle_delete_schedule(const char *payload, char *out)
+{
+    char title[200], day[200], time_raw[200];
+    // time_raw sẽ chứa chuỗi gốc "9h, 14h"
+
+    // 1. Đọc dữ liệu thô
+    sscanf(payload, "DELETE_SCHEDULE title=\"%199[^\"]\" day=\"%199[^\"]\" time=\"%199[^\"]\"",
+           title, day, time_raw);
+
+    // 2. Kiểm tra Phim và Ngày (Chỉ cần kiểm tra 1 lần)
+    int mi = find_movie_by_title(title);
+    if (mi < 0)
+    {
+        strcpy(out, "ERROR: Movie not found");
+        return;
+    }
+
+    int di = map_day_to_index(day);
+    if (di < 0)
+    {
+        strcpy(out, "ERROR: Invalid day");
+        return;
+    }
+
+    // 3. Xử lý cắt chuỗi thời gian bằng dấu phẩy
+    int deleted_count = 0;               // Đếm số suất đã xóa được
+    char *token = strtok(time_raw, ","); // Lấy giờ đầu tiên
+
+    while (token != NULL)
+    {
+        // --- BƯỚC QUAN TRỌNG: Xóa khoảng trắng thừa ở đầu ---
+        // Ví dụ: " 14h" (dư dấu cách) -> "14h"
+        while (*token == ' ')
+            token++;
+
+        // Tìm vị trí suất chiếu này
+        int ti = find_time_slot(mi, di, token);
+
+        if (ti >= 0)
+        {
+            // Nếu tìm thấy -> Xóa
+            movie_cache[mi].schedule[di][ti][0] = '\0';
+            memset(movie_cache[mi].seatmap[di][ti], ' ', sizeof(movie_cache[mi].seatmap[di][ti]));
+            deleted_count++;
+            printf("DEBUG: Deleted time slot [%s]\n", token);
+        }
+        else
+        {
+            printf("DEBUG: Time slot [%s] not found to delete\n", token);
+        }
+
+        // Lấy giờ tiếp theo
+        token = strtok(NULL, ",");
+    }
+
+    // 4. Lưu và phản hồi
+    if (deleted_count > 0)
+    {
+        save_all_movies("movies.txt");
+        // Thông báo đã xóa bao nhiêu suất
+        sprintf(out, "SUCCESS: Deleted %d schedule(s)", deleted_count);
+    }
+    else
+    {
+        // Không xóa được cái nào (do nhập sai hết hoặc không tìm thấy)
+        strcpy(out, "ERROR: No matching time slots found to delete");
+    }
+}

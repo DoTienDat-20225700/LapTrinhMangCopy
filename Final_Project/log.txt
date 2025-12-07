@@ -1,0 +1,5 @@
+[Mon Dec  8 01:57:31 2025] RECV: LOGIN username=dat password=123456
+[Mon Dec  8 01:57:31 2025] SEND: SUCCESS role=admin
+[Mon Dec  8 01:57:51 2025] RECV: ADD_SCHEDULE title="Đất Rừng Phương Nam" day="thứ 2" time="9h, 14h
+"
+[Mon Dec  8 01:57:51 2025] SEND: SUCCESS: Added 2 schedules

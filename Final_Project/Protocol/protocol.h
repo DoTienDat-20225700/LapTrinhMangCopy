@@ -1,10 +1,11 @@
 #ifndef PROTOCOL_H
 #define PROTOCOL_H
 
-#define MAXLINE 1024
-#define MAX_PAYLOAD 1000
+#define MAXLINE 4096
+#define MAX_PAYLOAD 4096
 
-typedef enum {
+typedef enum
+{
     CREATE_ACCOUNT,
     LOGIN,
     CHECK_USERNAME,
@@ -16,10 +17,22 @@ typedef enum {
     FILTER_TIME,
     GET_SEATMAP,
     BOOK_SEAT,
+
+    ADD_MOVIE,
+    DELETE_MOVIE,
+    UPDATE_MOVIE,
+    ADD_SCHEDULE,
+    DELETE_SCHEDULE,
+    RESET_SEATMAP,
+    LIST_USERS,
+    DELETE_USER,
+    SET_ROLE,
+
     UNKNOWN
 } CommandType;
 
-typedef struct {
+typedef struct
+{
     CommandType type;
     char payload[MAX_PAYLOAD];
 } Message;

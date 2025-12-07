@@ -1,10 +1,11 @@
-Nhà Ma Xó|Gia Đình, Kinh Dị|108|Thứ 2:7h,12h,15h,20h,22h;Thứ 4:7h,12h,15h,20h,22h;Thứ 7:7h,12h,15h,20h,22h;Chủ Nhật:18h
-Cục Vàng Của Ngoại|Gia Đình, Tâm Lý|119|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h;Chủ Nhật:7h,12h,15h,20h,22h
-Gió Vẫn Thổi|Hoạt Hình|127|Thứ 4:7h,12h,15h,20h,22h;Thứ 5:8h,13h,16h,21h,23h;Thứ 6:12h;Chủ Nhật:7h,12h,15h,20h,22h
-Phỏng Vấn Sát Nhân|Hồi Hộp, Kịch Tính, Tội Phạm|107|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h;Thứ 5:14h,16h;Chủ Nhật:10h,14h,16h,22h
-Tử Chiến Trên Không|Hành Động, Hồi Hộp|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 6:8h,13h,16h,21h,23h;Chủ Nhật:10h,14h,16h,22h
+Nhà Ma Xó|Gia Đình, Kinh Dị|108|Thứ 2:7h,12h,15h,20h,22h;Thứ 4:7h,12h,15h,20h,22h;Thứ 7:7h,12h,15h,20h,22h
+Cục Vàng Của Ngoại|Gia Đình, Tâm Lý|119|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h
+Gió Vẫn Thổi|Hoạt Hình|127|Thứ 4:7h,12h,15h,20h,22h;Thứ 5:8h,13h,16h,21h,23h;Thứ 6:12h
+Phỏng Vấn Sát Nhân|Hồi Hộp, Kịch Tính, Tội Phạm|107|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h;Thứ 5:14h,16h
+Tử Chiến Trên Không|Hành Động, Hồi Hộp|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 6:8h,13h,16h,21h,23h
 Tee Yod: Quỷ Ăn Tạng|Kinh Dị|104|Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h
 Tổ Quốc Trong Tim: The Concert Film|Hoà Nhạc, Phim Tài Liệu|120|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:7h,9h,17h,20h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:7h,9h,17h,20h,22h
-Năm Của Anh, Ngày Của Em|Thần Thoại, Tình Cảm|112|Thứ 2:7h,9h,17h,20h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h;Chủ Nhật:7h,10h,17h,20h,22h
+Năm Của Anh, Ngày Của Em|Thần Thoại, Tình Cảm|112|Thứ 2:7h,9h,17h,20h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
 Trò Chơi Ảo Giác: Ares|Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:10h,14h,16h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:10h,14h,16h,22h
 Tay Anh Giữ Một Vì Sao|Hài, Tình Cảm|117|Thứ 2:7h,9h,17h,20h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
+Đất Rừng Phương Nam|Tâm Lý, Phiêu Lưu|110|
