@@ -20,6 +20,7 @@ int movie_count = 0;
 
 void log_message(const char *direction, const char *msg)
 {
+    printf("[%s] %s\n", direction, msg);
     FILE *fp = fopen("log.txt", "a");
     if (!fp)
         return;
@@ -130,6 +131,7 @@ int main()
     printf("Server running on port %d...\n", PORT);
 
     movie_count = load_movies("movies.txt", movie_cache, 100);
+    load_bookings();
     user_count = load_users("users.txt", users, MAX_USERS);
     fd_set readfds;
     FD_ZERO(&readfds);

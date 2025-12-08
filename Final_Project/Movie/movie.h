@@ -19,6 +19,8 @@ typedef struct
 int map_day_to_index(const char *day);
 int load_movies(const char *filename, Movie *movies, int max_movies);
 int save_movie(const char *filename, const Movie *movie);
+void save_bookings();
+void load_bookings();
 
 // Server-side handlers
 void handle_list_movies(char *response_out);

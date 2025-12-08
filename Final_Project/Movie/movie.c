@@ -13,6 +13,30 @@ extern int movie_count;
 
 // --- CÁC HÀM TIỆN ÍCH (HELPER FUNCTIONS) ---
 
+// Hàm phụ trợ: Lấy tên ngày từ index (để lưu vào file)
+const char *get_day_name(int index)
+{
+    switch (index)
+    {
+    case 0:
+        return "Thứ 2";
+    case 1:
+        return "Thứ 3";
+    case 2:
+        return "Thứ 4";
+    case 3:
+        return "Thứ 5";
+    case 4:
+        return "Thứ 6";
+    case 5:
+        return "Thứ 7";
+    case 6:
+        return "Chủ Nhật";
+    default:
+        return "Unknown";
+    }
+}
+
 // Hàm trả về 1 nếu giống nhau(không phân biệt hoa thường), trả về 0 nếu khác nhau
 int string_equals_ignore_case(const char *s1, const char *s2)
 {
@@ -258,6 +282,104 @@ int save_all_movies(const char *filename)
     }
     fclose(fp);
     return 1;
+}
+
+// Hàm lưu toàn bộ ghế đã đặt ra file bookings.txt
+void save_bookings()
+{
+    FILE *fp = fopen("bookings.txt", "w");
+    if (!fp)
+        return;
+
+    for (int i = 0; i < movie_count; i++)
+    {
+        Movie *m = &movie_cache[i];
+        for (int d = 0; d < MAX_DAYS; d++)
+        {
+            for (int s = 0; s < MAX_SLOTS; s++)
+            {
+                // Nếu không có lịch chiếu thì bỏ qua
+                if (strlen(m->schedule[d][s]) == 0)
+                    continue;
+
+                // Quét ma trận ghế 3x5
+                for (int r = 0; r < 3; r++)
+                {
+                    for (int c = 0; c < 5; c++)
+                    {
+                        if (m->seatmap[d][s][r][c] == 'x')
+                        {
+                            // Format: Tên Phim|Ngày|Giờ|Hàng|Cột
+                            fprintf(fp, "%s|%s|%s|%d|%d\n",
+                                    m->title, get_day_name(d), m->schedule[d][s], r + 1, c + 1);
+                        }
+                    }
+                }
+            }
+        }
+    }
+    fclose(fp);
+}
+
+// Hàm đọc file bookings.txt và đánh dấu ghế x vào RAM
+void load_bookings()
+{
+    FILE *fp = fopen("bookings.txt", "r");
+    if (!fp)
+        return; // Nếu chưa có file thì thôi
+
+    char line[512];
+    while (fgets(line, sizeof(line), fp))
+    {
+        char title[100], day[50], time[20];
+        int row, col;
+
+        // Xóa xuống dòng
+        line[strcspn(line, "\r\n")] = 0;
+
+        // Parse dữ liệu: Title|Day|Time|Row|Col
+        // Dùng sscanf cẩn thận với chuỗi có dấu cách
+        char *token = strtok(line, "|");
+        if (!token)
+            continue;
+        strcpy(title, token);
+
+        token = strtok(NULL, "|");
+        if (!token)
+            continue;
+        strcpy(day, token);
+        token = strtok(NULL, "|");
+        if (!token)
+            continue;
+        strcpy(time, token);
+        token = strtok(NULL, "|");
+        if (!token)
+            continue;
+        row = atoi(token);
+        token = strtok(NULL, "|");
+        if (!token)
+            continue;
+        col = atoi(token);
+
+        // Tìm lại vị trí trong RAM để tick 'x'
+        int mi = find_movie_by_title(title);
+        if (mi >= 0)
+        {
+            int di = map_day_to_index(day);
+            if (di >= 0)
+            {
+                int ti = find_time_slot(mi, di, time);
+                if (ti >= 0)
+                {
+                    if (row >= 1 && row <= 3 && col >= 1 && col <= 5)
+                    {
+                        movie_cache[mi].seatmap[di][ti][row - 1][col - 1] = 'x';
+                    }
+                }
+            }
+        }
+    }
+    fclose(fp);
 }
 
 // --- CÁC HÀM XỬ LÝ (HANDLERS) ---
@@ -528,7 +650,7 @@ void handle_book_seat(const char *payload, char *response_out)
     movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] = 'x';
 
     // Lưu lại file
-    save_all_movies("movies.txt");
+    save_bookings();
 
     sprintf(response_out, "SUCCESS: Booked seat (%d,%d) for '%s' at %s %s",
             row, col, movie_cache[movie_index].title, day, time);
@@ -709,6 +831,7 @@ void handle_reset_seatmap(const char *payload, char *out)
     if (mi >= 0 && di >= 0 && ti >= 0)
     {
         memset(movie_cache[mi].seatmap[di][ti], ' ', sizeof(movie_cache[mi].seatmap[di][ti]));
+        save_bookings();
         strcpy(out, "SUCCESS: Seatmap reset");
     }
     else

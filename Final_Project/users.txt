@@ -3,3 +3,5 @@ ngoctran 111111 user
 chien 234567 user
 user 123123 user
 admin 123123 admin
+ha 123123 user
+user1 123123 user

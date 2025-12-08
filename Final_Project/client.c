@@ -445,14 +445,6 @@ int main(int argc, char *argv[])
     {
         show_user_menu(sockfd, &servaddr);
     }
-    if (strcmp(role, "admin") == 0)
-    {
-        show_admin_menu(sockfd, &servaddr);
-    }
-    else
-    {
-        show_user_menu(sockfd, &servaddr);
-    }
 
     close(sockfd);
     return 0;
