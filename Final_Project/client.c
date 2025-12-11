@@ -334,10 +334,13 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
         case 4:
         {
-            char title[100], time[10], day[20];
-            printf("Enter movie title: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = '\0';
+            int movie_id;
+            char time[10], day[20];
+            printf("Enter movie ID: ");
+            scanf("%d", &movie_id);
+            // Xóa bộ đệm sau khi scanf số
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
 
             printf("Enter day (e.g., Thứ 2): ");
             fgets(day, sizeof(day), stdin);
@@ -349,7 +352,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 ; // flush after scanf
 
             // Request seatmap once
-            sprintf(buffer, "GET_SEATMAP title=\"%s\" day=\"%s\" start=%s", title, day, time);
+            sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", movie_id, day, time);
             send_and_receive(sockfd, servaddr, buffer, response);
 
             // Kiểm tra nếu server báo lỗi (không tìm thấy phim/giờ/ngày)
@@ -373,12 +376,12 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 while ((c = getchar()) != '\n' && c != EOF)
                     ;
 
-                sprintf(buffer, "BOOK_SEAT title=\"%s\" day=\"%s\" time=%s row=%d col=%d", title, day, time, row, col);
+                sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", movie_id, day, time, row, col);
                 send_and_receive(sockfd, servaddr, buffer, response);
                 printf("%s\n", response);
 
                 // Show updated seatmap
-                sprintf(buffer, "GET_SEATMAP title=\"%s\" day=\"%s\" start=%s", title, day, time);
+                sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", movie_id, day, time);
                 send_and_receive(sockfd, servaddr, buffer, response);
                 printf("Updated Seatmap:\n%s\n", response);
 

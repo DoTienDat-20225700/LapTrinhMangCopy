@@ -8,6 +8,7 @@
 
 typedef struct
 {
+    int id;
     char title[MAX_TITLE];
     char genre[MAX_GENRE];
     int duration;
@@ -16,6 +17,7 @@ typedef struct
 } Movie;
 
 // Core movie database functions
+int find_movie_by_id(int id);
 int map_day_to_index(const char *day);
 int load_movies(const char *filename, Movie *movies, int max_movies);
 int save_movie(const char *filename, const Movie *movie);

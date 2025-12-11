@@ -1,11 +1,10 @@
-Nhà Ma Xó|Kinh Dị|150|Thứ 2:7h,12h,15h,20h,22h;Thứ 4:7h,12h,15h,20h,22h;Thứ 7:7h,12h,15h,20h,22h
-Cục Vàng Của Ngoại|Gia Đình, Tâm Lý|119|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h
-Gió Vẫn Thổi|Hoạt Hình|127|Thứ 4:7h,12h,15h,20h,22h;Thứ 5:8h,13h,16h,21h,23h;Thứ 6:12h
-Phỏng Vấn Sát Nhân|Hồi Hộp, Kịch Tính, Tội Phạm|107|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h;Thứ 5:14h,16h
-Tử Chiến Trên Không|Hành Động, Hồi Hộp|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 6:8h,13h,16h,21h,23h
-Tee Yod: Quỷ Ăn Tạng|Kinh Dị|104|Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h
-Tổ Quốc Trong Tim: The Concert Film|Hoà Nhạc, Phim Tài Liệu|120|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:7h,9h,17h,20h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:7h,9h,17h,20h,22h
-Năm Của Anh, Ngày Của Em|Thần Thoại, Tình Cảm|112|Thứ 2:7h,9h,17h,20h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
-Trò Chơi Ảo Giác: Ares|Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:10h,14h,16h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:10h,14h,16h,22h
-Tay Anh Giữ Một Vì Sao|Hài, Tình Cảm|117|Thứ 2:7h,9h,17h,20h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
-Nhà Ma Xó|Gia Đình|120|
+1|Nhà Ma Xó|Kinh Dị|150|Thứ 2:7h,12h,15h,20h,22h;Thứ 4:7h,12h,15h,20h,22h;Thứ 7:7h,12h,15h,20h,22h
+2|Cục Vàng Của Ngoại|Gia Đình, Tâm Lý|119|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h
+3|Gió Vẫn Thổi|Hoạt Hình|127|Thứ 4:7h,12h,15h,20h,22h;Thứ 5:8h,13h,16h,21h,23h;Thứ 6:12h
+4|Phỏng Vấn Sát Nhân|Hồi Hộp, Kịch Tính, Tội Phạm|107|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h;Thứ 5:14h,16h
+5|Tử Chiến Trên Không|Hành Động, Hồi Hộp|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 6:8h,13h,16h,21h,23h
+6|Tee Yod: Quỷ Ăn Tạng|Kinh Dị|104|Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h
+7|Tổ Quốc Trong Tim: The Concert Film|Hoà Nhạc, Phim Tài Liệu|120|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:7h,9h,17h,20h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:7h,9h,17h,20h,22h
+8|Năm Của Anh, Ngày Của Em|Thần Thoại, Tình Cảm|112|Thứ 2:7h,9h,17h,20h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
+9|Trò Chơi Ảo Giác: Ares|Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:10h,14h,16h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:10h,14h,16h,22h
+10|Tay Anh Giữ Một Vì Sao|Hài, Tình Cảm|117|Thứ 2:7h,9h,17h,20h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h

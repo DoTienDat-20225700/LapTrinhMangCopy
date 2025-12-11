@@ -125,6 +125,17 @@ void normalize_time(char *out, const char *in)
 }
 
 // --- CÁC HÀM TÌM KIẾM CORE ---
+int find_movie_by_id(int id)
+{
+    for (int i = 0; i < movie_count; i++)
+    {
+        if (movie_cache[i].id == id)
+        {
+            return i;
+        }
+    }
+    return -1;
+}
 
 int find_movie_by_title(const char *title)
 {
@@ -176,13 +187,15 @@ int load_movies(const char *filename, Movie *movies, int max_movies)
         line[strcspn(line, "\r\n")] = '\0';
 
         char *saveptr1;
+        char *id_str = strtok_r(line, "|", &saveptr1);
         char *title = strtok_r(line, "|", &saveptr1);
         char *genre = strtok_r(NULL, "|", &saveptr1);
         char *duration_str = strtok_r(NULL, "|", &saveptr1);
         char *schedule_str = strtok_r(NULL, "", &saveptr1);
 
-        if (!title || !genre || !duration_str || !schedule_str)
+        if (!id_str || !title || !genre || !duration_str || !schedule_str)
             continue;
+        movies[count].id = atoi(id_str);
 
         strncpy(movies[count].title, title, sizeof(movies[count].title) - 1);
         strncpy(movies[count].genre, genre, sizeof(movies[count].genre) - 1);
@@ -201,37 +214,43 @@ int load_movies(const char *filename, Movie *movies, int max_movies)
             }
         }
 
-        char schedule_copy[800];
-        strncpy(schedule_copy, schedule_str, sizeof(schedule_copy) - 1);
-        schedule_copy[sizeof(schedule_copy) - 1] = '\0';
-
-        char *saveptr2;
-        char *day_block = strtok_r(schedule_copy, ";", &saveptr2);
-        while (day_block)
+        if (schedule_str && strlen(schedule_str) > 0)
         {
-            char *saveptr3;
-            char *day = strtok_r(day_block, ":", &saveptr3);
-            char *times = strtok_r(NULL, "", &saveptr3);
-
-            if (day && times)
+            char schedule_copy[2048];
+            strncpy(schedule_copy, schedule_str, sizeof(schedule_copy) - 1);
+            schedule_copy[sizeof(schedule_copy) - 1] = '\0';
+            char *saveptr2;
+            char *day_block = strtok_r(schedule_copy, ";", &saveptr2);
+            while (day_block)
             {
-                int day_index = map_day_to_index(day);
-                if (day_index >= 0 && day_index < MAX_DAYS)
+                char *colon = strchr(day_block, ':');
+                if (colon)
                 {
-                    int slot = 0;
-                    char *saveptr4;
-                    char *time = strtok_r(times, ",", &saveptr4);
-                    while (time && slot < MAX_SLOTS)
+                    *colon = '\0';
+                    int d_idx = map_day_to_index(day_block);
+                    if (d_idx >= 0)
                     {
-                        strncpy(movies[count].schedule[day_index][slot], time, 9);
-                        movies[count].schedule[day_index][slot][9] = '\0';
-                        slot++;
-                        time = strtok_r(NULL, ",", &saveptr4);
+                        char *times = colon + 1;
+                        char *saveptr3;
+                        char *t = strtok_r(times, ",", &saveptr3);
+                        int s_idx = 0;
+                        while (t && s_idx < MAX_SLOTS)
+                        {
+                            while (*t == ' ')
+                                t++;
+                            if (strlen(t) > 0)
+                            {
+                                strncpy(movies[count].schedule[d_idx][s_idx], t, 9);
+                                s_idx++;
+                            }
+                            t = strtok_r(NULL, ",", &saveptr3);
+                        }
                     }
                 }
+                day_block = strtok_r(NULL, ";", &saveptr2);
             }
-            day_block = strtok_r(NULL, ";", &saveptr2);
         }
+
         count++;
     }
     fclose(fp);
@@ -247,7 +266,7 @@ int save_all_movies(const char *filename)
     for (int i = 0; i < movie_count; i++)
     {
         Movie *m = &movie_cache[i];
-        fprintf(fp, "%s|%s|%d|", m->title, m->genre, m->duration);
+        fprintf(fp, "%d|%s|%s|%d|", m->id, m->title, m->genre, m->duration);
 
         int has_schedule = 0;
         for (int d = 0; d < MAX_DAYS; d++)
@@ -261,12 +280,7 @@ int save_all_movies(const char *filename)
                     {
                         if (has_schedule)
                             fprintf(fp, ";");
-                        fprintf(fp, "%s:", d == 0 ? "Thứ 2" : d == 1 ? "Thứ 3"
-                                                          : d == 2   ? "Thứ 4"
-                                                          : d == 3   ? "Thứ 5"
-                                                          : d == 4   ? "Thứ 6"
-                                                          : d == 5   ? "Thứ 7"
-                                                                     : "Chủ Nhật");
+                        fprintf(fp, "%s:", get_day_name(d));
                         has_day = 1;
                         has_schedule = 1;
                     }
@@ -390,8 +404,8 @@ void handle_list_movies(char *response_out)
     for (int i = 0; i < movie_count; i++)
     {
         char line[256];
-        sprintf(line, "Title: %s\nGenre: %s\nDuration: %d mins\n\n",
-                movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
+        sprintf(line, "[ID: %d] Title: %s\nGenre: %s\nDuration: %d mins\n\n",
+                movie_cache[i].id, movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
         if (strlen(response_out) + strlen(line) < MAXLINE)
             strcat(response_out, line);
     }
@@ -564,15 +578,15 @@ void handle_filter_time(const char *payload, char *response_out)
 
 void handle_get_seatmap(const char *payload, char *response_out)
 {
-    char title[MAX_TITLE], day[50], time[20];
+    int movie_id;
+    char day[50], time[20];
 
     // Parse input: hỗ trợ dấu ngoặc kép
-    sscanf(payload, "GET_SEATMAP title=\"%[^\"]\" day=\"%[^\"]\" start=%s", title, day, time);
-
-    int movie_index = find_movie_by_title(title);
+    sscanf(payload, "GET_SEATMAP id=%d day=\"%[^\"]\" start=%s", &movie_id, day, time);
+    int movie_index = find_movie_by_id(movie_id);
     if (movie_index == -1)
     {
-        sprintf(response_out, "Movie not found: %s", title);
+        sprintf(response_out, "Movie ID not found: %d", movie_id);
         return;
     }
 
@@ -606,17 +620,16 @@ void handle_get_seatmap(const char *payload, char *response_out)
 
 void handle_book_seat(const char *payload, char *response_out)
 {
-    int row, col;
-    char title[MAX_TITLE], day[50], time[20];
+    int row, col, movie_id;
+    char day[50], time[20];
 
     // Parse input: hỗ trợ dấu ngoặc kép
-    sscanf(payload, "BOOK_SEAT title=\"%[^\"]\" day=\"%[^\"]\" time=%s row=%d col=%d",
-           title, day, time, &row, &col);
+    sscanf(payload, "BOOK_SEAT id=%d day=\"%[^\"]\" time=%s row=%d col=%d", &movie_id, day, time, &row, &col);
 
-    int movie_index = find_movie_by_title(title);
+    int movie_index = find_movie_by_id(movie_id);
     if (movie_index == -1)
     {
-        sprintf(response_out, "Movie not found: %s", title);
+        sprintf(response_out, "Movie ID not found: %d", movie_id);
         return;
     }
 
@@ -656,7 +669,7 @@ void handle_book_seat(const char *payload, char *response_out)
             row, col, movie_cache[movie_index].title, day, time);
 }
 
-// --- CÁC HÀM ADMIN (GIỮ LẠI CHO ĐẦY ĐỦ) ---
+// --- CÁC HÀM ADMIN ---
 
 void handle_add_movie(const char *payload, char *out)
 {
@@ -673,20 +686,24 @@ void handle_add_movie(const char *payload, char *out)
     }
 
     Movie *m = &movie_cache[movie_count++];
+    if (movie_count == 0)
+        m->id = 1;
+    else
+        m->id = movie_cache[movie_count - 1].id + 1;
     strcpy(m->title, title);
     strcpy(m->genre, genre);
     m->duration = duration;
 
     memset(m->schedule, 0, sizeof(m->schedule));
     memset(m->seatmap, 0, sizeof(m->seatmap));
-
+    movie_count++;
     if (!save_all_movies("movies.txt"))
     {
         strcpy(out, "ERROR: Cannot save movie file");
         return;
     }
 
-    strcpy(out, "SUCCESS: Movie added");
+    sprintf(out, "SUCCESS: Movie added (ID: %d)", m->id);
 }
 
 void handle_delete_movie(const char *payload, char *out)
