@@ -579,6 +579,10 @@ void handle_filter_time(const char *payload, char *response_out)
 
     int u_begin = atoi(begin_str);
     int u_end = atoi(end_str);
+    if (u_end == 0)
+        u_end = 24;
+    if (u_end < u_begin)
+        u_end += 24;
 
     printf("Filtering time: Day=%s, Range: %dh - %dh\n", day, u_begin, u_end);
 
@@ -595,25 +599,32 @@ void handle_filter_time(const char *payload, char *response_out)
             if (strlen(time_str) == 0)
                 continue;
             int m_start_h = atoi(time_str);
-            if (m_start_h >= u_begin && m_start_h <= u_end)
+            int compare_h = m_start_h;
+            if (u_end > 24 && m_start_h < u_begin)
             {
-                int duration = movie_cache[i].duration;
-                int m_end_h = m_start_h + (duration / 60);
-                int m_end_m = duration % 60;
-                char slot_info[50];
-                sprintf(slot_info, "%02dh00 - %02dh%02d", m_start_h, m_end_h, m_end_m);
-
-                if (found_slots > 0)
-                    strcat(time_list, ", ");
-                strcat(time_list, slot_info);
-
-                found_slots++;
+                compare_h += 24;
             }
+            if (compare_h >= u_begin && compare_h <= u_end)
+                if (m_start_h >= u_begin && m_start_h <= u_end)
+                {
+                    int duration = movie_cache[i].duration;
+                    int total_end_minutes = (m_start_h * 60) + duration;
+                    int m_end_h = (total_end_minutes / 60) % 24;
+                    int m_end_m = total_end_minutes % 60;
+                    char slot_info[50];
+                    sprintf(slot_info, "%02dh00 - %02dh%02d", m_start_h, m_end_h, m_end_m);
+                    if (found_slots > 0)
+                        strcat(time_list, ", ");
+                    strcat(time_list, slot_info);
+
+                    found_slots++;
+                }
         }
         if (found_slots > 0)
         {
             char movie_entry[MAXLINE];
-            sprintf(movie_entry, "Title: %s\nGenre: %s\nDuration: %d mins\nSchedule: %s\n\n",
+            sprintf(movie_entry, "[ID: %d] Title: %s\nGenre: %s\nDuration: %d mins\nSchedule: %s\n\n",
+                    movie_cache[i].id,
                     movie_cache[i].title,
                     movie_cache[i].genre,
                     movie_cache[i].duration,
