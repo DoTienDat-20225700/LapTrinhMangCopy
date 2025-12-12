@@ -13,6 +13,77 @@ extern int movie_count;
 
 // --- CÁC HÀM TIỆN ÍCH (HELPER FUNCTIONS) ---
 
+// Hàm xóa khoảng trắng đầu và cuối chuỗi
+void trim(char *s)
+{
+    char *p = s;
+    int l = strlen(p);
+
+    while (l > 0 && isspace(p[l - 1]))
+        p[--l] = 0;
+    while (*p && isspace(*p))
+        ++p, --l;
+
+    memmove(s, p, l + 1);
+}
+
+// Hàm trả về 1 nếu giống nhau(không phân biệt hoa thường), trả về 0 nếu khác nhau
+int string_equals_ignore_case(const char *s1, const char *s2)
+{
+    while (*s1 && *s2)
+    {
+        // So sánh từng ký tự sau khi chuyển về chữ thường
+        if (tolower((unsigned char)*s1) != tolower((unsigned char)*s2))
+        {
+            return 0; // Khác nhau
+        }
+        s1++;
+        s2++;
+    }
+    // Kiểm tra xem cả 2 chuỗi đã kết thúc cùng lúc chưa (độ dài bằng nhau)
+    return *s1 == *s2;
+}
+
+// Trả về số lượng thể loại tìm được. Danh sách lưu vào mảng `out_list`
+int get_unique_genres(char out_list[50][MAX_GENRE])
+{
+    int count = 0;
+
+    for (int i = 0; i < movie_count; i++)
+    {
+        // Tạo bản sao để cắt chuỗi (vì strtok làm hỏng chuỗi gốc)
+        char temp_genre[MAX_GENRE];
+        strcpy(temp_genre, movie_cache[i].genre);
+
+        char *token = strtok(temp_genre, ",");
+        while (token != NULL)
+        {
+            trim(token); // Xóa khoảng trắng thừa (ví dụ " Kinh Dị" -> "Kinh Dị")
+
+            // Kiểm tra xem thể loại này đã có trong danh sách chưa
+            int exists = 0;
+            for (int j = 0; j < count; j++)
+            {
+                if (string_equals_ignore_case(out_list[j], token))
+                {
+                    exists = 1;
+                    break;
+                }
+            }
+
+            // Nếu chưa có thì thêm vào
+            if (!exists && count < 50)
+            {
+                strcpy(out_list[count], token);
+                count++;
+            }
+
+            token = strtok(NULL, ",");
+        }
+    }
+    return count;
+}
+
 // Hàm phụ trợ: Lấy tên ngày từ index (để lưu vào file)
 const char *get_day_name(int index)
 {
@@ -35,37 +106,6 @@ const char *get_day_name(int index)
     default:
         return "Unknown";
     }
-}
-
-// Hàm trả về 1 nếu giống nhau(không phân biệt hoa thường), trả về 0 nếu khác nhau
-int string_equals_ignore_case(const char *s1, const char *s2)
-{
-    while (*s1 && *s2)
-    {
-        // So sánh từng ký tự sau khi chuyển về chữ thường
-        if (tolower((unsigned char)*s1) != tolower((unsigned char)*s2))
-        {
-            return 0; // Khác nhau
-        }
-        s1++;
-        s2++;
-    }
-    // Kiểm tra xem cả 2 chuỗi đã kết thúc cùng lúc chưa (độ dài bằng nhau)
-    return *s1 == *s2;
-}
-
-// Hàm xóa khoảng trắng đầu và cuối chuỗi
-void trim(char *s)
-{
-    char *p = s;
-    int l = strlen(p);
-
-    while (l > 0 && isspace(p[l - 1]))
-        p[--l] = 0;
-    while (*p && isspace(*p))
-        ++p, --l;
-
-    memmove(s, p, l + 1);
 }
 
 // Hàm tìm chuỗi con không phân biệt hoa thường
@@ -170,90 +210,97 @@ int find_time_slot(int movie_index, int day_index, const char *time)
 
 // --- CÁC HÀM FILE I/O ---
 
+// ... (Các hàm khác giữ nguyên)
+
 int load_movies(const char *filename, Movie *movies, int max_movies)
 {
     FILE *fp = fopen(filename, "r");
     if (!fp)
     {
-        perror("Cannot open file");
+        printf("Server: Movie file not found (starting fresh).\n");
         return 0;
     }
 
-    char line[1024];
+    char line[4096];
     int count = 0;
 
     while (fgets(line, sizeof(line), fp) && count < max_movies)
     {
-        line[strcspn(line, "\r\n")] = '\0';
+        // Xóa ký tự xuống dòng
+        line[strcspn(line, "\r\n")] = 0;
 
-        char *saveptr1;
-        char *id_str = strtok_r(line, "|", &saveptr1);
-        char *title = strtok_r(line, "|", &saveptr1);
-        char *genre = strtok_r(NULL, "|", &saveptr1);
-        char *duration_str = strtok_r(NULL, "|", &saveptr1);
-        char *schedule_str = strtok_r(NULL, "", &saveptr1);
-
-        if (!id_str || !title || !genre || !duration_str || !schedule_str)
+        // Bỏ qua dòng quá ngắn hoặc dòng trống
+        if (strlen(line) < 2)
             continue;
+
+        char *saveptr;
+        // Tách các trường
+        char *id_str = strtok_r(line, "|", &saveptr);
+        char *title = strtok_r(NULL, "|", &saveptr);
+        char *genre = strtok_r(NULL, "|", &saveptr);
+        char *dur_str = strtok_r(NULL, "|", &saveptr);
+
+        // Phần lịch chiếu là phần còn lại
+        char *sched_str = saveptr;
+
+        // Nếu thiếu thông tin quan trọng thì âm thầm bỏ qua (không in lỗi nữa)
+        if (!id_str || !title || !genre || !dur_str)
+            continue;
+
+        // --- GÁN DỮ LIỆU ---
         movies[count].id = atoi(id_str);
+        strncpy(movies[count].title, title, MAX_TITLE - 1);
+        strncpy(movies[count].genre, genre, MAX_GENRE - 1);
+        movies[count].duration = atoi(dur_str);
 
-        strncpy(movies[count].title, title, sizeof(movies[count].title) - 1);
-        strncpy(movies[count].genre, genre, sizeof(movies[count].genre) - 1);
-        movies[count].title[sizeof(movies[count].title) - 1] = '\0';
-        movies[count].genre[sizeof(movies[count].genre) - 1] = '\0';
-        movies[count].duration = atoi(duration_str);
-
-        // Reset schedule & seatmap
+        // Reset dữ liệu cũ
         for (int d = 0; d < MAX_DAYS; d++)
-        {
             for (int s = 0; s < MAX_SLOTS; s++)
             {
-                movies[count].schedule[d][s][0] = '\0';
-                // Mặc định ghế trống (' ')
-                memset(movies[count].seatmap[d][s], ' ', sizeof(movies[count].seatmap[d][s]));
+                movies[count].schedule[d][s][0] = 0;
+                memset(movies[count].seatmap[d][s], ' ', 15);
             }
-        }
 
-        if (schedule_str && strlen(schedule_str) > 0)
+        // Xử lý lịch chiếu (Parsing Schedule)
+        if (sched_str && strlen(sched_str) > 0)
         {
-            char schedule_copy[2048];
-            strncpy(schedule_copy, schedule_str, sizeof(schedule_copy) - 1);
-            schedule_copy[sizeof(schedule_copy) - 1] = '\0';
-            char *saveptr2;
-            char *day_block = strtok_r(schedule_copy, ";", &saveptr2);
+            char sched_copy[2048];
+            strncpy(sched_copy, sched_str, 2047);
+
+            char *sp2;
+            char *day_block = strtok_r(sched_copy, ";", &sp2);
             while (day_block)
             {
                 char *colon = strchr(day_block, ':');
                 if (colon)
                 {
-                    *colon = '\0';
+                    *colon = 0;
                     int d_idx = map_day_to_index(day_block);
                     if (d_idx >= 0)
                     {
-                        char *times = colon + 1;
-                        char *saveptr3;
-                        char *t = strtok_r(times, ",", &saveptr3);
+                        char *sp3;
+                        char *t = strtok_r(colon + 1, ",", &sp3);
                         int s_idx = 0;
                         while (t && s_idx < MAX_SLOTS)
                         {
                             while (*t == ' ')
                                 t++;
                             if (strlen(t) > 0)
-                            {
-                                strncpy(movies[count].schedule[d_idx][s_idx], t, 9);
-                                s_idx++;
-                            }
-                            t = strtok_r(NULL, ",", &saveptr3);
+                                strcpy(movies[count].schedule[d_idx][s_idx++], t);
+                            t = strtok_r(NULL, ",", &sp3);
                         }
                     }
                 }
-                day_block = strtok_r(NULL, ";", &saveptr2);
+                day_block = strtok_r(NULL, ";", &sp2);
             }
         }
 
+        // In nhẹ nhàng để biết đã load được phim nào
+        printf("Server: Loaded Movie [%d] %s\n", movies[count].id, movies[count].title);
         count++;
     }
     fclose(fp);
+    printf("Server: Database ready. Total %d movies.\n", count);
     return count;
 }
 
@@ -441,59 +488,66 @@ void handle_search(const char *payload, char *response_out)
 
 void handle_list_genres(char *response_out)
 {
-    char genres[100][MAX_GENRE];
-    int count = 0;
-    strcpy(response_out, "");
+    char unique_genres[50][MAX_GENRE];
+    int count = get_unique_genres(unique_genres);
 
-    for (int i = 0; i < movie_count; i++)
+    if (count == 0)
     {
-        char temp_genre[MAX_GENRE];
-        strcpy(temp_genre, movie_cache[i].genre);
-        char *token = strtok(temp_genre, ",");
-        while (token != NULL)
-        {
-            trim(token);
-            int found = 0;
-            for (int j = 0; j < count; j++)
-            {
-                if (strcmp(genres[j], token) == 0)
-                {
-                    found = 1;
-                    break;
-                }
-            }
-            if (!found)
-            {
-                strcpy(genres[count++], token);
-            }
-            token = strtok(NULL, ",");
-        }
+        strcpy(response_out, "No genres available.");
+        return;
     }
+
+    strcpy(response_out, "Available genres:\n");
     for (int i = 0; i < count; i++)
     {
-        if (strlen(response_out) + strlen(genres[i]) + 2 < MAXLINE)
+        char line[100];
+        // Format: "1. Kinh Dị\n"
+        sprintf(line, "%d. %s\n", i + 1, unique_genres[i]);
+
+        if (strlen(response_out) + strlen(line) < MAXLINE)
         {
-            strcat(response_out, genres[i]);
-            strcat(response_out, "\n");
+            strcat(response_out, line);
         }
     }
 }
 
 void handle_filter_genre(const char *payload, char *response_out)
 {
-    char genre[MAX_GENRE];
-    sscanf(payload, "FILTER_GENRE genre=\"%[^\"]\"", genre);
+    int genre_id;
+    // Nhận ID từ client (Format: FILTER_GENRE id=1)
+    sscanf(payload, "FILTER_GENRE id=%d", &genre_id);
 
-    printf("Filtering genre: %s\n", genre);
+    // 1. Tái tạo lại danh sách thể loại để tìm xem ID đó ứng với tên gì
+    char unique_genres[50][MAX_GENRE];
+    int total_genres = get_unique_genres(unique_genres);
+
+    // 2. Validate ID
+    if (genre_id < 1 || genre_id > total_genres)
+    {
+        sprintf(response_out, "Invalid Genre ID: %d", genre_id);
+        return;
+    }
+
+    // 3. Lấy tên thể loại (ID 1 -> index 0)
+    char *target_genre = unique_genres[genre_id - 1];
+
+    // 4. Tìm phim theo tên thể loại vừa lấy được
     strcpy(response_out, "");
     int found_count = 0;
+
+    // Thêm dòng thông báo đang lọc theo gì
+    char header[100];
+    sprintf(header, "--- Movies with genre: %s ---\n", target_genre);
+    strcat(response_out, header);
+
     for (int i = 0; i < movie_count; i++)
     {
-        if (stristr(movie_cache[i].genre, genre) != NULL)
+        // Dùng stristr để tìm (ví dụ phim "Hài, Tình Cảm" chứa "Hài")
+        if (stristr(movie_cache[i].genre, target_genre) != NULL)
         {
             char line[MAXLINE];
-            sprintf(line, "Title: %s\nDuration: %d mins\n\n",
-                    movie_cache[i].title, movie_cache[i].duration);
+            sprintf(line, "[ID: %d] %s\nGenre: %s\nDuration: %d mins\n\n",
+                    movie_cache[i].id, movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
 
             if (strlen(response_out) + strlen(line) < MAXLINE)
             {
@@ -502,9 +556,10 @@ void handle_filter_genre(const char *payload, char *response_out)
             }
         }
     }
+
     if (found_count == 0)
     {
-        strcpy(response_out, "No movies found for this genre.");
+        strcat(response_out, "No movies found.");
     }
 }
 
@@ -685,11 +740,19 @@ void handle_add_movie(const char *payload, char *out)
         return;
     }
 
-    Movie *m = &movie_cache[movie_count++];
+    int new_id;
     if (movie_count == 0)
-        m->id = 1;
+    {
+        new_id = 1;
+    }
     else
-        m->id = movie_cache[movie_count - 1].id + 1;
+    {
+        new_id = movie_cache[movie_count - 1].id + 1;
+    }
+
+    Movie *m = &movie_cache[movie_count];
+
+    m->id = new_id;
     strcpy(m->title, title);
     strcpy(m->genre, genre);
     m->duration = duration;

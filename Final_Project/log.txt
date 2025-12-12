@@ -1,10 +1,27 @@
-[Thu Dec 11 16:08:08 2025] RECV: LOGIN username=user password=123123
-[Thu Dec 11 16:08:08 2025] SEND: SUCCESS role=user
-[Thu Dec 11 16:08:10 2025] RECV: LIST_MOVIES
-[Thu Dec 11 16:08:10 2025] SEND: 
-[Thu Dec 11 16:08:18 2025] RECV: SEARCH title=gió
-[Thu Dec 11 16:08:18 2025] SEND: NOT_FOUND
-[Thu Dec 11 16:08:28 2025] RECV: LIST_GENRES
-[Thu Dec 11 16:08:28 2025] SEND: 
-[Thu Dec 11 16:08:32 2025] RECV: FILTER_GENRE genre="kinh dị"
-[Thu Dec 11 16:08:32 2025] SEND: No movies found for this genre.
+[Fri Dec 12 15:34:03 2025] RECV: LOGIN username=user password=123123
+[Fri Dec 12 15:34:03 2025] SEND: SUCCESS role=user
+[Fri Dec 12 15:34:07 2025] RECV: LIST_GENRES
+[Fri Dec 12 15:34:07 2025] SEND: Available genres:
+1. Kinh Dị
+2. Gia Đình
+3. Tâm Lý
+4. Hoạt Hình
+5. Hồi Hộp
+6. Kịch Tính
+7. Tội Phạm
+8. Hành Động
+9. Hoà Nhạc
+10. Phim Tài Liệu
+11. Thần Thoại
+12. Tình Cảm
+13. Khoa Học Viễn Tưởng
+14. Phiêu Lưu
+15. Hài
+
+[Fri Dec 12 15:34:11 2025] RECV: FILTER_GENRE id=6
+[Fri Dec 12 15:34:11 2025] SEND: --- Movies with genre: Kịch Tính ---
+[ID: 4] Phỏng Vấn Sát Nhân
+Genre: Hồi Hộp, Kịch Tính, Tội Phạm
+Duration: 107 mins
+
+

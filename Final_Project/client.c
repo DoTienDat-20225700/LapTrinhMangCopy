@@ -299,16 +299,21 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
             if (filter_choice == 1)
             {
+                // 1. Lấy danh sách thể loại (Server đã in sẵn số 1, 2, 3...)
                 strcpy(buffer, "LIST_GENRES");
                 send_and_receive(sockfd, servaddr, buffer, response);
-                printf("Available genres:\n%s\n", response);
+                printf("%s\n", response);
 
-                char genre[50];
-                printf("Enter genre: ");
-                fgets(genre, sizeof(genre), stdin);
-                genre[strcspn(genre, "\n")] = '\0';
-                printf("Filtering genre: %s\n", genre);
-                sprintf(buffer, "FILTER_GENRE genre=\"%s\"", genre);
+                // 2. Yêu cầu nhập số ID
+                int genre_id;
+                printf("Enter genre ID (number): ");
+                scanf("%d", &genre_id);
+                while ((c = getchar()) != '\n' && c != EOF)
+                    ; // Xóa bộ đệm
+                printf("Filtering genre ID: %d\n", genre_id);
+
+                // 3. Gửi ID lên server
+                sprintf(buffer, "FILTER_GENRE id=%d", genre_id);
                 send_and_receive(sockfd, servaddr, buffer, response);
                 printf("%s\n", response);
             }

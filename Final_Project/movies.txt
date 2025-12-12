@@ -8,3 +8,5 @@
 8|Năm Của Anh, Ngày Của Em|Thần Thoại, Tình Cảm|112|Thứ 2:7h,9h,17h,20h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
 9|Trò Chơi Ảo Giác: Ares|Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:10h,14h,16h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:10h,14h,16h,22h
 10|Tay Anh Giữ Một Vì Sao|Hài, Tình Cảm|117|Thứ 2:7h,9h,17h,20h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
+11|Đất Rừng Phương Nam|Phiêu Lưu|110|
+0|||0|
