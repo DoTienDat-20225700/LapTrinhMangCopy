@@ -202,7 +202,6 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
 
             sprintf(buffer, "UPDATE_MOVIE id=%d new_genre=\"%s\" new_duration=%d", id, new_genre, new_duration);
             break;
-            break;
         }
         case 4:
         { // Add Schedule

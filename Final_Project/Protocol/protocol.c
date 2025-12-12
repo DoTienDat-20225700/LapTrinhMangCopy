@@ -44,7 +44,7 @@ CommandType parse_command_type(const char *payload)
         return DELETE_USER;
     if (strncmp(payload, "SET_ROLE", 8) == 0)
         return SET_ROLE;
-    if (strncmp(payload, "EXIT", 3) == 0)
+    if (strncmp(payload, "EXIT", 4) == 0)
         return EXIT;
     return UNKNOWN;
 }
