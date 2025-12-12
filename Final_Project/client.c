@@ -153,54 +153,71 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         }
         case 2:
         { // Delete Movie
-            char title[100];
-            printf("Title to delete: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = 0;
-            sprintf(buffer, "DELETE_MOVIE title=\"%s\"", title);
+            int id;
+            printf("Enter Movie ID to delete: ");
+            scanf("%d", &id);
+            sprintf(buffer, "DELETE_MOVIE id=%d", id);
             break;
         }
         case 3:
         { // Update Movie
-            char title[100], new_genre[50];
-            int new_duration;
-            printf("Title to update: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = 0;
+            int id, new_duration;
+            char new_genre[50];
+            printf("Enter Movie ID to update: ");
+            scanf("%d", &id);
+            while ((c = getchar()) != '\n' && c != EOF)
+                ; // Xóa buffer
+
             printf("New Genre: ");
             fgets(new_genre, sizeof(new_genre), stdin);
             new_genre[strcspn(new_genre, "\n")] = 0;
+
             printf("New Duration: ");
             scanf("%d", &new_duration);
-            sprintf(buffer, "UPDATE_MOVIE title=\"%s\" new_genre=\"%s\" new_duration=%d", title, new_genre, new_duration);
+
+            sprintf(buffer, "UPDATE_MOVIE id=%d new_genre=\"%s\" new_duration=%d", id, new_genre, new_duration);
+            break;
             break;
         }
         case 4:
         { // Add Schedule
-            char title[100], day[20], time[100];
-            printf("Title: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = 0;
-            printf("Day (e.g., Thứ 2): ");
+            int id;
+            char day[20], time[100];
+
+            printf("Enter Movie ID: ");
+            scanf("%d", &id);
+            while ((c = getchar()) != '\n' && c != EOF)
+                ; // Xóa bộ đệm
+
+            printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
             day[strcspn(day, "\n")] = 0;
-            printf("Time (e.g., 18h): ");
+
+            printf("Time (e.g., 9h, 14h): ");
             fgets(time, sizeof(time), stdin);
-            sprintf(buffer, "ADD_SCHEDULE title=\"%s\" day=\"%s\" time=\"%s\"", title, day, time);
+            time[strcspn(time, "\n")] = 0;
+
+            sprintf(buffer, "ADD_SCHEDULE id=%d day=\"%s\" time=\"%s\"", id, day, time);
             break;
         }
         case 5:
         { // Delete Schedule
-            char title[100], day[20], time[100];
-            printf("Title: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = 0;
-            printf("Day (e.g., Thứ 2): ");
+            int id;
+            char day[20], time[100];
+            printf("Enter Movie ID: ");
+            scanf("%d", &id);
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
+
+            printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
             day[strcspn(day, "\n")] = 0;
-            printf("Time (e.g., 18h): ");
+
+            printf("Time to delete (e.g., 9h): ");
             fgets(time, sizeof(time), stdin);
-            sprintf(buffer, "DELETE_SCHEDULE title=\"%s\" day=\"%s\" time=\"%s\"", title, day, time);
+            time[strcspn(time, "\n")] = 0;
+
+            sprintf(buffer, "DELETE_SCHEDULE id=%d day=\"%s\" time=\"%s\"", id, day, time);
             break;
         }
         case 6:
@@ -210,16 +227,21 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         }
         case 7:
         { // Reset Seatmap
-            char title[100], day[20], time[10];
-            printf("Title: ");
-            fgets(title, sizeof(title), stdin);
-            title[strcspn(title, "\n")] = 0;
+            int id;
+            char day[20], time[20];
+            printf("Enter Movie ID: ");
+            scanf("%d", &id);
+            while ((c = getchar()) != '\n' && c != EOF)
+                ;
+
             printf("Day: ");
             fgets(day, sizeof(day), stdin);
             day[strcspn(day, "\n")] = 0;
+
             printf("Time: ");
             scanf("%s", time);
-            sprintf(buffer, "RESET_SEATMAP title=\"%s\" day=\"%s\" time=%s", title, day, time);
+
+            sprintf(buffer, "RESET_SEATMAP id=%d day=\"%s\" time=%s", id, day, time);
             break;
         }
         case 8:

@@ -781,57 +781,46 @@ void handle_add_movie(const char *payload, char *out)
 
 void handle_delete_movie(const char *payload, char *out)
 {
-    char title[200];
+    int id;
+    sscanf(payload, "DELETE_MOVIE id=%d", &id); // Nhận ID thay vì Title
 
-    // 1. Lấy tên phim từ payload
-    sscanf(payload, "DELETE_MOVIE title=\"%199[^\"]\"", title);
-
-    // 2. Tìm vị trí phim
-    int index = find_movie_by_title(title);
-
+    int index = find_movie_by_id(id);
     if (index < 0)
     {
-        strcpy(out, "ERROR: Movie not found");
+        strcpy(out, "ERROR: Movie ID not found");
         return;
     }
 
-    // 3. Thực hiện xóa bằng cách dồn mảng
-    // Ví dụ: Mảng có [A, B, C, D], xóa B (index 1)
-    // Ta chép C đè lên B, D đè lên C -> [A, C, D]
+    // Dồn mảng để xóa
     for (int i = index; i < movie_count - 1; i++)
     {
         movie_cache[i] = movie_cache[i + 1];
     }
 
-    // 4. Giảm số lượng phim và làm sạch phần tử cuối (để tránh rác)
     movie_count--;
-    memset(&movie_cache[movie_count], 0, sizeof(Movie));
-
-    // 5. Lưu lại file
+    memset(&movie_cache[movie_count], 0, sizeof(Movie)); // Xóa rác ở cuối
     save_all_movies("movies.txt");
 
-    // 6. Thông báo thành công
-    // Gửi lại tên phim GỐC (trong danh sách) để user biết chính xác phim nào đã xóa
-    sprintf(out, "SUCCESS: Deleted movie");
+    sprintf(out, "SUCCESS: Deleted movie ID %d", id);
 }
 
 void handle_update_movie(const char *payload, char *out)
 {
-    char title[100], new_genre[50];
-    int new_duration;
-    sscanf(payload,
-           "UPDATE_MOVIE title=\"%[^\"]\" new_genre=\"%[^\"]\" new_duration=%d",
-           title, new_genre, &new_duration);
+    int id, new_duration;
+    char new_genre[50];
 
-    int i = find_movie_by_title(title);
-    if (i < 0)
+    sscanf(payload, "UPDATE_MOVIE id=%d new_genre=\"%[^\"]\" new_duration=%d",
+           &id, new_genre, &new_duration);
+
+    int index = find_movie_by_id(id);
+    if (index < 0)
     {
-        strcpy(out, "ERROR: Movie not found");
+        strcpy(out, "ERROR: Movie ID not found");
         return;
     }
 
-    strcpy(movie_cache[i].genre, new_genre);
-    movie_cache[i].duration = new_duration;
+    strcpy(movie_cache[index].genre, new_genre);
+    movie_cache[index].duration = new_duration;
     save_all_movies("movies.txt");
 
     strcpy(out, "SUCCESS: Movie updated");
@@ -839,16 +828,16 @@ void handle_update_movie(const char *payload, char *out)
 
 void handle_add_schedule(const char *payload, char *out)
 {
-    char title[100], day[20], time_list[200];
+    int id;
+    char day[20], time_list[200];
 
-    // Parse input: time nằm trong ngoặc kép (time="%[^"]")
-    sscanf(payload, "ADD_SCHEDULE title=\"%[^\"]\" day=\"%[^\"]\" time=\"%[^\"]\"",
-           title, day, time_list);
+    sscanf(payload, "ADD_SCHEDULE id=%d day=\"%[^\"]\" time=\"%[^\"]\"",
+           &id, day, time_list);
 
-    int movie_index = find_movie_by_title(title);
-    if (movie_index < 0)
+    int mi = find_movie_by_id(id);
+    if (mi < 0)
     {
-        strcpy(out, "ERROR: Movie not found");
+        strcpy(out, "ERROR: Movie ID not found");
         return;
     }
 
@@ -859,91 +848,74 @@ void handle_add_schedule(const char *payload, char *out)
         return;
     }
 
-    Movie *m = &movie_cache[movie_index];
-    int added_count = 0;
-    int slots_full = 0;
+    Movie *m = &movie_cache[mi];
+    int count = 0;
 
-    // Tách chuỗi bằng dấu phẩy (ví dụ "9h, 14h, 19h")
+    // Tách chuỗi giờ (ví dụ: "9h, 14h")
     char *token = strtok(time_list, ",");
     while (token != NULL)
     {
-        trim(token); // Xóa khoảng trắng thừa (ví dụ " 14h" -> "14h")
-
+        trim(token);
         if (strlen(token) > 0)
         {
-            int found_empty = 0;
-            // Tìm slot trống để nhét giờ vào
-            for (int i = 0; i < MAX_SLOTS; i++)
+            for (int s = 0; s < MAX_SLOTS; s++)
             {
-                if (strlen(m->schedule[di][i]) == 0)
-                {
-                    strncpy(m->schedule[di][i], token, 9);
-                    m->schedule[di][i][9] = '\0'; // Đảm bảo null-terminated
-
-                    // Reset ghế cho suất chiếu mới này
-                    memset(m->seatmap[di][i], ' ', sizeof(m->seatmap[di][i]));
-
-                    found_empty = 1;
-                    added_count++;
+                if (strlen(m->schedule[di][s]) == 0)
+                { // Tìm slot trống
+                    strcpy(m->schedule[di][s], token);
+                    memset(m->seatmap[di][s], ' ', 15); // Reset ghế
+                    count++;
                     break;
                 }
             }
-            if (!found_empty)
-                slots_full = 1;
         }
         token = strtok(NULL, ",");
     }
 
-    if (added_count > 0)
-    {
-        save_all_movies("movies.txt");
-        if (slots_full)
-            sprintf(out, "SUCCESS: Added %d schedules (Warning: Some slots were full)", added_count);
-        else
-            sprintf(out, "SUCCESS: Added %d schedules", added_count);
-    }
-    else
-    {
-        strcpy(out, "ERROR: No schedules added (Slots full or invalid input)");
-    }
+    save_all_movies("movies.txt");
+    sprintf(out, "SUCCESS: Added %d schedules for ID %d", count, id);
 }
 
 void handle_reset_seatmap(const char *payload, char *out)
 {
-    char title[100], day[20], time[10];
-    sscanf(payload, "RESET_SEATMAP title=\"%[^\"]\" day=\"%[^\"]\" time=%s",
-           title, day, time);
+    int id;
+    char day[20], time[20];
+    sscanf(payload, "RESET_SEATMAP id=%d day=\"%[^\"]\" time=%s", &id, day, time);
 
-    int mi = find_movie_by_title(title);
+    int mi = find_movie_by_id(id);
+    if (mi < 0)
+    {
+        strcpy(out, "ERROR: Movie ID not found");
+        return;
+    }
+
     int di = map_day_to_index(day);
     int ti = find_time_slot(mi, di, time);
 
-    if (mi >= 0 && di >= 0 && ti >= 0)
+    if (di >= 0 && ti >= 0)
     {
-        memset(movie_cache[mi].seatmap[di][ti], ' ', sizeof(movie_cache[mi].seatmap[di][ti]));
-        save_bookings();
+        memset(movie_cache[mi].seatmap[di][ti], ' ', 15);
+        save_bookings(); // Lưu lại trạng thái trống
         strcpy(out, "SUCCESS: Seatmap reset");
     }
     else
     {
-        strcpy(out, "ERROR: Slot not found");
+        strcpy(out, "ERROR: Schedule not found");
     }
 }
 
 void handle_delete_schedule(const char *payload, char *out)
 {
-    char title[200], day[200], time_raw[200];
-    // time_raw sẽ chứa chuỗi gốc "9h, 14h"
+    int id;
+    char day[20], time_raw[200];
 
-    // 1. Đọc dữ liệu thô
-    sscanf(payload, "DELETE_SCHEDULE title=\"%199[^\"]\" day=\"%199[^\"]\" time=\"%199[^\"]\"",
-           title, day, time_raw);
+    sscanf(payload, "DELETE_SCHEDULE id=%d day=\"%[^\"]\" time=\"%[^\"]\"",
+           &id, day, time_raw);
 
-    // 2. Kiểm tra Phim và Ngày (Chỉ cần kiểm tra 1 lần)
-    int mi = find_movie_by_title(title);
+    int mi = find_movie_by_id(id);
     if (mi < 0)
     {
-        strcpy(out, "ERROR: Movie not found");
+        strcpy(out, "ERROR: Movie ID not found");
         return;
     }
 
@@ -954,47 +926,29 @@ void handle_delete_schedule(const char *payload, char *out)
         return;
     }
 
-    // 3. Xử lý cắt chuỗi thời gian bằng dấu phẩy
-    int deleted_count = 0;               // Đếm số suất đã xóa được
-    char *token = strtok(time_raw, ","); // Lấy giờ đầu tiên
-
-    while (token != NULL)
+    int del_count = 0;
+    char *token = strtok(time_raw, ",");
+    while (token)
     {
-        // --- BƯỚC QUAN TRỌNG: Xóa khoảng trắng thừa ở đầu ---
-        // Ví dụ: " 14h" (dư dấu cách) -> "14h"
-        while (*token == ' ')
-            token++;
-
-        // Tìm vị trí suất chiếu này
+        trim(token);
         int ti = find_time_slot(mi, di, token);
-
         if (ti >= 0)
         {
-            // Nếu tìm thấy -> Xóa
-            movie_cache[mi].schedule[di][ti][0] = '\0';
-            memset(movie_cache[mi].seatmap[di][ti], ' ', sizeof(movie_cache[mi].seatmap[di][ti]));
-            deleted_count++;
-            printf("DEBUG: Deleted time slot [%s]\n", token);
+            movie_cache[mi].schedule[di][ti][0] = 0;          // Xóa giờ
+            memset(movie_cache[mi].seatmap[di][ti], ' ', 15); // Xóa ghế
+            del_count++;
         }
-        else
-        {
-            printf("DEBUG: Time slot [%s] not found to delete\n", token);
-        }
-
-        // Lấy giờ tiếp theo
         token = strtok(NULL, ",");
     }
 
-    // 4. Lưu và phản hồi
-    if (deleted_count > 0)
+    if (del_count > 0)
     {
         save_all_movies("movies.txt");
-        // Thông báo đã xóa bao nhiêu suất
-        sprintf(out, "SUCCESS: Deleted %d schedule(s)", deleted_count);
+        save_bookings(); // Cập nhật cả file booking nếu cần
+        sprintf(out, "SUCCESS: Deleted %d schedule(s)", del_count);
     }
     else
     {
-        // Không xóa được cái nào (do nhập sai hết hoặc không tìm thấy)
-        strcpy(out, "ERROR: No matching time slots found to delete");
+        strcpy(out, "ERROR: Time slot not found");
     }
 }
