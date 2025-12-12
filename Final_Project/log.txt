@@ -1,117 +1,12 @@
-[Sat Dec 13 03:17:31 2025] RECV: CREATE_ACCOUNT username=admin password=123 role=user
-[Sat Dec 13 03:17:31 2025] SEND: EXISTS
-[Sat Dec 13 03:17:46 2025] RECV: CREATE_ACCOUNT username=user1 password=123 role=user
-[Sat Dec 13 03:17:46 2025] SEND: EXISTS
-[Sat Dec 13 03:18:01 2025] RECV: CREATE_ACCOUNT username=user2 password=123 role=user
-[Sat Dec 13 03:18:01 2025] SEND: SUCCESS
-[Sat Dec 13 03:18:09 2025] RECV: LOGIN username=user2 password=123
-[Sat Dec 13 03:18:09 2025] SEND: SUCCESS role=user
-[Sat Dec 13 03:18:13 2025] RECV: LIST_MOVIES
-[Sat Dec 13 03:18:13 2025] SEND: [ID: 1] Title: Nhà Ma Xó
-Genre: Kinh Dị
-Duration: 150 mins
-
-[ID: 2] Title: Cục Vàng Của Ngoại
-Genre: Gia Đình, Tâm Lý
-Duration: 119 mins
-
-[ID: 3] Title: Gió Vẫn Thổi
-Genre: Hoạt Hình
-Duration: 127 mins
-
-[ID: 4] Title: Phỏng Vấn Sát Nhân
-Genre: Hồi Hộp, Kịch Tính, Tội Phạm
-Duration: 107 mins
-
-[ID: 5] Title: Tử Chiến Trên Không
-Genre: Hành Động, Hồi Hộp
-Duration: 118 mins
-
-[ID: 6] Title: Tee Yod: Quỷ Ăn Tạng
-Genre: Kinh Dị
-Duration: 104 mins
-
-[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
-Genre: Hoà Nhạc, Phim Tài Liệu
-Duration: 120 mins
-
-[ID: 8] Title: Năm Của Anh, Ngày Của Em
-Genre: Thần Thoại, Tình Cảm
-Duration: 112 mins
-
-[ID: 9] Title: Trò Chơi Ảo Giác: Ares
-Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
-Duration: 118 mins
-
-[ID: 10] Title: Tay Anh Giữ Một Vì Sao
-Genre: Hài, Tình Cảm
-Duration: 117 mins
-
-[ID: 11] Title: Đất Rừng Phương Nam
-Genre: Phiêu Lưu
-Duration: 110 mins
-
-
-[Sat Dec 13 03:18:33 2025] RECV: SEARCH title=gió
-[Sat Dec 13 03:18:33 2025] SEND: Title: Gió Vẫn Thổi
-Genre: Hoạt Hình
-Duration: 127 mins
-
-
-[Sat Dec 13 03:18:39 2025] RECV: LIST_GENRES
-[Sat Dec 13 03:18:39 2025] SEND: Available genres:
-1. Kinh Dị
-2. Gia Đình
-3. Tâm Lý
-4. Hoạt Hình
-5. Hồi Hộp
-6. Kịch Tính
-7. Tội Phạm
-8. Hành Động
-9. Hoà Nhạc
-10. Phim Tài Liệu
-11. Thần Thoại
-12. Tình Cảm
-13. Khoa Học Viễn Tưởng
-14. Phiêu Lưu
-15. Hài
-
-[Sat Dec 13 03:18:42 2025] RECV: FILTER_GENRE id=2
-[Sat Dec 13 03:18:42 2025] SEND: --- Movies with genre: Gia Đình ---
-[ID: 2] Cục Vàng Của Ngoại
-Genre: Gia Đình, Tâm Lý
-Duration: 119 mins
-
-
-[Sat Dec 13 03:18:58 2025] RECV: FILTER_TIME day="thứ 2" begin=12h end=0h
-[Sat Dec 13 03:18:58 2025] SEND: [ID: 1] Title: Nhà Ma Xó
-Genre: Kinh Dị
-Duration: 150 mins
-Schedule: 12h00 - 14h30, 15h00 - 17h30, 20h00 - 22h30, 22h00 - 00h30
-
-[ID: 5] Title: Tử Chiến Trên Không
-Genre: Hành Động, Hồi Hộp
-Duration: 118 mins
-Schedule: 17h00 - 18h58, 20h00 - 21h58, 22h00 - 23h58
-
-[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
-Genre: Hoà Nhạc, Phim Tài Liệu
-Duration: 120 mins
-Schedule: 17h00 - 19h00, 20h00 - 22h00, 22h00 - 00h00
-
-[ID: 8] Title: Năm Của Anh, Ngày Của Em
-Genre: Thần Thoại, Tình Cảm
-Duration: 112 mins
-Schedule: 17h00 - 18h52, 20h00 - 21h52
-
-[ID: 9] Title: Trò Chơi Ảo Giác: Ares
-Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
-Duration: 118 mins
-Schedule: 17h00 - 18h58, 20h00 - 21h58, 22h00 - 23h58
-
-[ID: 10] Title: Tay Anh Giữ Một Vì Sao
-Genre: Hài, Tình Cảm
-Duration: 117 mins
-Schedule: 17h00 - 18h57, 20h00 - 21h57
-
-
+[Sat Dec 13 04:45:31 2025] RECV: LOGIN username=dat password=123456
+[Sat Dec 13 04:45:31 2025] SEND: SUCCESS role=admin
+[Sat Dec 13 04:49:25 2025] RECV: LOGIN username=dat password=123456
+[Sat Dec 13 04:49:25 2025] SEND: SUCCESS role=admin
+[Sat Dec 13 04:50:07 2025] RECV: LOGIN username=dat password=123456
+[Sat Dec 13 04:50:07 2025] SEND: SUCCESS role=admin
+[Sat Dec 13 04:50:48 2025] RECV: EXIT
+[Sat Dec 13 04:50:48 2025] SEND: Goodbye! See you again.
+[Sat Dec 13 04:51:02 2025] RECV: LOGIN username=dat password=123456
+[Sat Dec 13 04:51:02 2025] SEND: SUCCESS role=admin
+[Sat Dec 13 04:51:37 2025] RECV: EXIT
+[Sat Dec 13 04:51:37 2025] SEND: Goodbye! See you again.

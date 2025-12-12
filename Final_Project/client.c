@@ -16,6 +16,30 @@ void clear_buffer()
         ;
 }
 
+int get_int(const char *prompt, int *value)
+{
+    printf("%s", prompt);
+    if (scanf("%d", value) != 1)
+    {
+        // Nếu nhập sai (không phải số)
+        printf("\n>>> Invalid input! Please enter a number.\n");
+
+        // Xóa sạch bộ đệm để tránh trôi lệnh
+        int c;
+        while ((c = getchar()) != '\n' && c != EOF)
+            ;
+
+        return 0; // Báo thất bại
+    }
+
+    // Nếu nhập đúng, cũng cần xóa bộ đệm (ký tự \n còn sót)
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+
+    return 1; // Báo thành công
+}
+
 void send_and_receive(int sockfd, struct sockaddr_in *servaddr, const char *message, char *response)
 {
     socklen_t len = sizeof(*servaddr);
@@ -125,10 +149,9 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         printf("8. List Users\n");
         printf("9. Delete User\n");
         printf("10. Set User Role\n");
-        printf("11. Exit\n> ");
-        scanf("%d", &choice);
-        clear_buffer();
-        ; // Clear buffer sau scanf
+        printf("11. Exit\n");
+        if (!get_int("> ", &choice))
+            continue;
 
         if (choice == 11)
         {
@@ -150,16 +173,16 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
             printf("Genre: ");
             fgets(genre, sizeof(genre), stdin);
             genre[strcspn(genre, "\n")] = 0;
-            printf("Duration (mins): ");
-            scanf("%d", &duration);
+            if (!get_int("Duration (mins): ", &duration))
+                continue;
             sprintf(buffer, "ADD_MOVIE title=\"%s\" genre=\"%s\" duration=%d", title, genre, duration);
             break;
         }
         case 2:
         { // Delete Movie
             int id;
-            printf("Enter Movie ID to delete: ");
-            scanf("%d", &id);
+            if (!get_int("Enter Movie ID to delete: ", &id))
+                continue;
             sprintf(buffer, "DELETE_MOVIE id=%d", id);
             break;
         }
@@ -167,17 +190,15 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         { // Update Movie
             int id, new_duration;
             char new_genre[50];
-            printf("Enter Movie ID to update: ");
-            scanf("%d", &id);
-            clear_buffer();
-            ; // Xóa buffer
+            if (!get_int("Enter Movie ID to update: ", &id))
+                continue;
 
             printf("New Genre: ");
             fgets(new_genre, sizeof(new_genre), stdin);
             new_genre[strcspn(new_genre, "\n")] = 0;
 
-            printf("New Duration: ");
-            scanf("%d", &new_duration);
+            if (!get_int("New Duration: ", &new_duration))
+                continue;
 
             sprintf(buffer, "UPDATE_MOVIE id=%d new_genre=\"%s\" new_duration=%d", id, new_genre, new_duration);
             break;
@@ -188,9 +209,8 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
             int id;
             char day[20], time[100];
 
-            printf("Enter Movie ID: ");
-            scanf("%d", &id);
-            clear_buffer(); // Xóa bộ đệm
+            if (!get_int("Enter Movie ID: ", &id))
+                continue;
 
             printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -207,9 +227,8 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         { // Delete Schedule
             int id;
             char day[20], time[100];
-            printf("Enter Movie ID: ");
-            scanf("%d", &id);
-            clear_buffer();
+            if (!get_int("Enter Movie ID: ", &id))
+                continue;
 
             printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -231,9 +250,8 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         { // Reset Seatmap
             int id;
             char day[20], time[20];
-            printf("Enter Movie ID: ");
-            scanf("%d", &id);
-            clear_buffer();
+            if (!get_int("Enter Movie ID: ", &id))
+                continue;
 
             printf("Day: ");
             fgets(day, sizeof(day), stdin);
@@ -290,10 +308,9 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
         printf("2. Search movie by name\n");
         printf("3. Filter movies\n");
         printf("4. Purchase tickets\n");
-        printf("5. Exit\n> ");
-        scanf("%d", &choice);
-        clear_buffer();
-
+        printf("5. Exit\n");
+        if (!get_int("> ", &choice))
+            continue;
         switch (choice)
         {
         case 1:
@@ -317,10 +334,10 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
         }
 
         case 3:
-            printf("Filter options:\n1. By genre\n2. By time\n> ");
+        {
             int filter_choice;
-            scanf("%d", &filter_choice);
-            clear_buffer();
+            if (!get_int("Filter options:\n1. By genre\n2. By time\n> ", &filter_choice))
+                break;
 
             if (filter_choice == 1)
             {
@@ -331,11 +348,8 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
                 // 2. Yêu cầu nhập số ID
                 int genre_id;
-                printf("Enter genre ID (number): ");
-                scanf("%d", &genre_id);
-                clear_buffer();
-
-                printf("Filtering genre ID: %d\n", genre_id);
+                if (!get_int("Filtering genre ID: ", &genre_id))
+                    break;
 
                 // 3. Gửi ID lên server
                 sprintf(buffer, "FILTER_GENRE id=%d", genre_id);
@@ -361,7 +375,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 printf("Invalid filter option.\n");
             }
             break;
-
+        }
         case 4:
         {
             int mid, row, col, book_choice;
@@ -369,9 +383,8 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
             char ticket_info[MAXLINE];
 
             // Yêu cầu nhập ID
-            printf("Enter Movie ID: ");
-            scanf("%d", &mid);
-            clear_buffer();
+            if (!get_int("Enter Movie ID: ", &mid))
+                break;
 
             printf("Enter day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -391,11 +404,10 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
             do
             {
-                printf("Row (1-3): ");
-                scanf("%d", &row);
-                printf("Column (1-5): ");
-                scanf("%d", &col);
-                clear_buffer();
+                if (!get_int("Row (1-3): ", &row))
+                    break;
+                if (!get_int("Col (1-5): ", &col))
+                    break;
 
                 // 1. Gửi lệnh Book vé
                 sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", mid, day, time, row, col);
@@ -411,11 +423,8 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 // 4. In vé
                 printf("%s\n", ticket_info);
 
-                printf("Do you want to book more seat?\n");
-                printf("1. Yes\n");
-                printf("2. No\n ");
-                scanf("%d", &book_choice);
-                clear_buffer();
+                if (!get_int("Do you want to book more?\n 1.Yes\n 2.No\n> ", &book_choice))
+                    break;
 
             } while (book_choice == 1);
             break;

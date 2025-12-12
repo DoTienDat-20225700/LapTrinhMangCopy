@@ -13,6 +13,30 @@ extern int movie_count;
 
 // --- CÁC HÀM TIỆN ÍCH (HELPER FUNCTIONS) ---
 
+// Hàm chuyển chuỗi giờ (vd: "17h30", "17", "17h") thành tổng số phút
+int time_str_to_minutes(const char *time_str)
+{
+    int h = 0, m = 0;
+
+    // Tạo bản sao để xử lý
+    char temp[20];
+    strncpy(temp, time_str, 19);
+
+    char *sep = strpbrk(temp, "h:");
+    if (sep)
+    {
+        *sep = '\0';
+        h = atoi(temp);
+        m = atoi(sep + 1);
+    }
+    else
+    {
+        h = atoi(temp);
+        m = 0;
+    }
+    return h * 60 + m;
+}
+
 // Hàm xóa khoảng trắng đầu và cuối chuỗi
 void trim(char *s)
 {
@@ -576,14 +600,21 @@ void handle_filter_time(const char *payload, char *response_out)
         return;
     }
 
-    int u_begin = atoi(begin_str);
-    int u_end = atoi(end_str);
-    if (u_end == 0)
-        u_end = 24;
-    if (u_end < u_begin)
-        u_end += 24;
+    // 1. Chuyển thời gian nhập của User sang PHÚT
+    int u_begin_mins = time_str_to_minutes(begin_str);
+    int u_end_mins = time_str_to_minutes(end_str);
 
-    printf("Filtering time: Day=%s, Range: %dh - %dh\n", day, u_begin, u_end);
+    // Xử lý logic 0h (nửa đêm)
+    if (u_end_mins == 0)
+        u_end_mins = 24 * 60; // 0h -> 24h (1440 phút)
+
+    // Xử lý tìm kiếm xuyên đêm (ví dụ: 22h -> 2h sáng hôm sau)
+    if (u_end_mins < u_begin_mins)
+    {
+        u_end_mins += 24 * 60; // Cộng thêm 24h vào giờ kết thúc
+    }
+
+    printf("Filtering time (mins): Day=%s, Range: %d - %d\n", day, u_begin_mins, u_end_mins);
 
     strcpy(response_out, "");
     int found_any_movie = 0;
@@ -597,27 +628,41 @@ void handle_filter_time(const char *payload, char *response_out)
             char *time_str = movie_cache[i].schedule[day_index][s];
             if (strlen(time_str) == 0)
                 continue;
-            int m_start_h = atoi(time_str);
-            int compare_h = m_start_h;
-            if (u_end > 24 && m_start_h < u_begin)
-            {
-                compare_h += 24;
-            }
-            if (compare_h >= u_begin && compare_h <= u_end)
-                if (m_start_h >= u_begin && m_start_h <= u_end)
-                {
-                    int duration = movie_cache[i].duration;
-                    int total_end_minutes = (m_start_h * 60) + duration;
-                    int m_end_h = (total_end_minutes / 60) % 24;
-                    int m_end_m = total_end_minutes % 60;
-                    char slot_info[50];
-                    sprintf(slot_info, "%02dh00 - %02dh%02d", m_start_h, m_end_h, m_end_m);
-                    if (found_slots > 0)
-                        strcat(time_list, ", ");
-                    strcat(time_list, slot_info);
 
-                    found_slots++;
-                }
+            // 2. Chuyển giờ chiếu của Phim sang PHÚT
+            int m_start_mins = time_str_to_minutes(time_str);
+            int duration = movie_cache[i].duration;
+            int m_end_mins = m_start_mins + duration; // Giờ kết thúc của phim
+            // Xử lý trường hợp phim chiếu sau nửa đêm trong logic xuyên đêm
+            // Nếu User tìm từ 22h (1320p) đến 26h (1560p), mà phim chiếu lúc 1h (60p)
+            // Ta cần hiểu 1h đó là 25h (1500p) để so sánh
+            int compare_start = m_start_mins;
+            int compare_end = m_end_mins;
+
+            if (u_end_mins > 24 * 60 && m_start_mins < u_begin_mins)
+            {
+                compare_start += 24 * 60;
+                compare_end += 24 * 60;
+            }
+
+            // 3. So sánh chính xác theo phút
+            if (compare_start >= u_begin_mins && compare_end <= u_end_mins)
+            {
+                // Tính toán để hiển thị
+                int m_show_start_h = (m_start_mins / 60) % 24;
+                int m_show_start_m = m_start_mins % 60;
+
+                int m_show_end_h = (m_end_mins / 60) % 24;
+                int m_show_end_m = m_end_mins % 60;
+
+                char slot_info[50];
+                sprintf(slot_info, "%02dh%02d - %02dh%02d", m_show_start_h, m_show_start_m, m_show_end_h, m_show_end_m);
+
+                if (found_slots > 0)
+                    strcat(time_list, ", ");
+                strcat(time_list, slot_info);
+                found_slots++;
+            }
         }
         if (found_slots > 0)
         {
@@ -729,8 +774,26 @@ void handle_book_seat(const char *payload, char *response_out)
     movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] = 'x';
     save_bookings();
 
-    // 4. --- TẠO VÉ (SỬA ĐOẠN NÀY) ---
-    // In ra dạng vé đẹp mắt thay vì dòng text đơn giản
+    int h = 0, m = 0;
+    char *sep = strpbrk(time, "h:");
+
+    if (sep != NULL)
+    {
+        *sep = '\0';
+        h = atoi(time);
+        m = atoi(sep + 1);
+        *sep = 'h';
+    }
+    else
+    {
+        h = atoi(time);
+        m = 0;
+    }
+
+    char display_time[20];
+    sprintf(display_time, "%02dh%02d", h, m);
+
+    // 4. In vé
     sprintf(response_out,
             "SUCCESS\n"
             "***************************************\n"
@@ -741,7 +804,7 @@ void handle_book_seat(const char *payload, char *response_out)
             "  Time  : %s\n"
             "  Seat  : Row %d - Col %d\n"
             "***************************************",
-            movie_cache[movie_index].title, day, time, row, col);
+            movie_cache[movie_index].title, day, display_time, row, col);
 }
 
 // --- CÁC HÀM ADMIN ---
