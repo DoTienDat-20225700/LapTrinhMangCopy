@@ -1,4 +1,3 @@
-// protocol.c
 #include "protocol.h"
 #include <string.h>
 #include <stdio.h>
@@ -45,6 +44,8 @@ CommandType parse_command_type(const char *payload)
         return DELETE_USER;
     if (strncmp(payload, "SET_ROLE", 8) == 0)
         return SET_ROLE;
+    if (strncmp(payload, "EXIT", 3) == 0)
+        return EXIT;
     return UNKNOWN;
 }
 
@@ -92,6 +93,9 @@ void format_message(CommandType type, const char *payload, char *out)
         break;
     case BOOK_SEAT:
         prefix = "BOOK_SEAT";
+        break;
+    case EXIT:
+        prefix = "EXIT";
         break;
     default:
         prefix = "UNKNOWN";

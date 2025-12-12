@@ -21,6 +21,8 @@ int movie_count = 0;
 void log_message(const char *direction, const char *msg)
 {
     printf("[%s] %s\n", direction, msg);
+    fflush(stdout);
+
     FILE *fp = fopen("log.txt", "a");
     if (!fp)
         return;
@@ -38,27 +40,35 @@ void handle_message(Message msg, char *response_out)
     case LOGIN:
         handle_login(msg.payload, response_out);
         break;
+
     case CREATE_ACCOUNT:
         handle_create_account(msg.payload, response_out);
         break;
+
     case LIST_MOVIES:
         handle_list_movies(response_out);
         break;
+
     case SEARCH:
         handle_search(msg.payload, response_out);
         break;
+
     case LIST_GENRES:
         handle_list_genres(response_out);
         break;
+
     case FILTER_GENRE:
         handle_filter_genre(msg.payload, response_out);
         break;
+
     case FILTER_TIME:
         handle_filter_time(msg.payload, response_out);
         break;
+
     case GET_SEATMAP:
         handle_get_seatmap(msg.payload, response_out);
         break;
+
     case BOOK_SEAT:
         handle_book_seat(msg.payload, response_out);
         break;
@@ -98,6 +108,11 @@ void handle_message(Message msg, char *response_out)
     case SET_ROLE:
         handle_set_role(msg.payload, response_out);
         break;
+
+    case EXIT:
+        strcpy(response_out, "Goodbye! See you again.");
+        break;
+
     default:
         strcpy(response_out, "UNKNOWN_COMMAND");
     }
@@ -114,6 +129,13 @@ int main()
     if (sockfd < 0)
     {
         perror("Socket creation failed");
+        exit(EXIT_FAILURE);
+    }
+
+    int opt = 1;
+    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+    {
+        perror("setsockopt");
         exit(EXIT_FAILURE);
     }
 

@@ -24,7 +24,6 @@ void send_and_receive(int sockfd, struct sockaddr_in *servaddr, const char *mess
     }
 }
 
-// Chuyển từ int sang void để tránh warning
 void handle_authentication(int sockfd, struct sockaddr_in *servaddr, char *role_out)
 {
     char buffer[MAXLINE], response[MAXLINE];
@@ -48,7 +47,6 @@ void handle_authentication(int sockfd, struct sockaddr_in *servaddr, char *role_
             sprintf(buffer, "LOGIN username=%s password=%s", username, password);
             send_and_receive(sockfd, servaddr, buffer, response);
 
-            // Server trả về: "SUCCESS admin" hoặc "SUCCESS user"
             if (strstr(response, "SUCCESS"))
             {
                 printf("Login successful!\n");
@@ -92,7 +90,9 @@ void handle_authentication(int sockfd, struct sockaddr_in *servaddr, char *role_
         }
         else if (choice == 3)
         {
-            printf("Goodbye!\n");
+            sprintf(buffer, "EXIT");
+            send_and_receive(sockfd, servaddr, buffer, response);
+            printf("%s\n", response);
             exit(0);
         }
         else
@@ -121,13 +121,18 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         printf("8. List Users\n");
         printf("9. Delete User\n");
         printf("10. Set User Role\n");
-        printf("0. Exit\n> ");
+        printf("11. Exit\n> ");
         scanf("%d", &choice);
         while ((c = getchar()) != '\n' && c != EOF)
             ; // Clear buffer sau scanf
 
-        if (choice == 0)
+        if (choice == 11)
+        {
+            sprintf(buffer, "EXIT");
+            send_and_receive(sockfd, servaddr, buffer, response);
+            printf("%s\n", response);
             break;
+        }
 
         switch (choice)
         {
@@ -246,7 +251,7 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         }
 
         send_and_receive(sockfd, servaddr, buffer, response);
-        printf("Server: %s\n", response);
+        printf("%s\n", response);
     }
 }
 
@@ -339,72 +344,71 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
         case 4:
         {
-            int movie_id;
-            char time[10], day[20];
-            printf("Enter movie ID: ");
-            scanf("%d", &movie_id);
-            // Xóa bộ đệm sau khi scanf số
+            int mid, row, col, book_choice;
+            char time[20], day[50];
+            char ticket_info[MAXLINE];
+            int c;
+
+            // Yêu cầu nhập ID
+            printf("Enter Movie ID: ");
+            scanf("%d", &mid);
             while ((c = getchar()) != '\n' && c != EOF)
                 ;
 
-            printf("Enter day (e.g., Thứ 2): ");
+            printf("Enter day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
-            day[strcspn(day, "\n")] = '\0';
+            day[strcspn(day, "\n")] = 0;
 
-            printf("Enter start time (e.g., 12h): ");
+            printf("Enter time (e.g., 7h): ");
             scanf("%s", time);
             while ((c = getchar()) != '\n' && c != EOF)
-                ; // flush after scanf
+                ;
 
-            // Request seatmap once
-            sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", movie_id, day, time);
+            // Hiện sơ đồ ghế ban đầu
+            sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", mid, day, time);
             send_and_receive(sockfd, servaddr, buffer, response);
+            printf("%s\n", response);
 
-            // Kiểm tra nếu server báo lỗi (không tìm thấy phim/giờ/ngày)
-            if (strstr(response, "not found") != NULL || strstr(response, "Invalid") != NULL)
-            {
-                printf("Server Error: %s\n", response);
+            if (strstr(response, "not found") || strstr(response, "Invalid"))
                 break;
-            }
 
-            printf("Seatmap:\n%s\n", response);
-            printf("|x| = booked, | | = available\n");
-
-            int book_choice;
             do
             {
-                int row, col;
-                printf("Choose seat:\nRow (1-3): ");
+                printf("Row (1-3): ");
                 scanf("%d", &row);
                 printf("Column (1-5): ");
                 scanf("%d", &col);
                 while ((c = getchar()) != '\n' && c != EOF)
                     ;
 
-                sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", movie_id, day, time, row, col);
-                send_and_receive(sockfd, servaddr, buffer, response);
-                printf("%s\n", response);
+                // 1. Gửi lệnh Book vé
+                sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", mid, day, time, row, col);
+                send_and_receive(sockfd, servaddr, buffer, ticket_info);
 
-                // Show updated seatmap
-                sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", movie_id, day, time);
+                // 2. Gửi lệnh lấy Seatmap mới
+                sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", mid, day, time);
                 send_and_receive(sockfd, servaddr, buffer, response);
+
+                // 3. In Seatmap
                 printf("Updated Seatmap:\n%s\n", response);
 
-                printf("Do you want to book another seat?\n");
+                // 4. In vé
+                printf("%s\n", ticket_info);
+
+                printf("Do you want to book more seat?\n");
                 printf("1. Yes\n");
-                printf("2. No\n");
-                printf("> ");
+                printf("2. No\n ");
                 scanf("%d", &book_choice);
                 while ((c = getchar()) != '\n' && c != EOF)
                     ;
-
             } while (book_choice == 1);
-
             break;
         }
 
         case 5:
-            printf("Goodbye!\n");
+            sprintf(buffer, "EXIT");
+            send_and_receive(sockfd, servaddr, buffer, response);
+            printf("%s\n", response);
             return;
 
         default:

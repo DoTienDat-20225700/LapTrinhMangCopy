@@ -678,9 +678,10 @@ void handle_book_seat(const char *payload, char *response_out)
     int row, col, movie_id;
     char day[50], time[20];
 
-    // Parse input: hỗ trợ dấu ngoặc kép
+    // 1. Parse input
     sscanf(payload, "BOOK_SEAT id=%d day=\"%[^\"]\" time=%s row=%d col=%d", &movie_id, day, time, &row, &col);
 
+    // 2. Validate
     int movie_index = find_movie_by_id(movie_id);
     if (movie_index == -1)
     {
@@ -714,14 +715,23 @@ void handle_book_seat(const char *payload, char *response_out)
         return;
     }
 
-    // Đặt ghế
+    // 3. Đặt ghế & Lưu
     movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] = 'x';
-
-    // Lưu lại file
     save_bookings();
 
-    sprintf(response_out, "SUCCESS: Booked seat (%d,%d) for '%s' at %s %s",
-            row, col, movie_cache[movie_index].title, day, time);
+    // 4. --- TẠO VÉ (SỬA ĐOẠN NÀY) ---
+    // In ra dạng vé đẹp mắt thay vì dòng text đơn giản
+    sprintf(response_out,
+            "SUCCESS\n"
+            "***************************************\n"
+            "* MOVIE TICKET              *\n"
+            "***************************************\n"
+            "  Movie : %s\n"
+            "  Day : %s\n"
+            "  Time  : %s\n"
+            "  Seat  : Row %d - Col %d\n"
+            "***************************************",
+            movie_cache[movie_index].title, day, time, row, col);
 }
 
 // --- CÁC HÀM ADMIN ---
@@ -776,7 +786,7 @@ void handle_delete_movie(const char *payload, char *out)
     // 1. Lấy tên phim từ payload
     sscanf(payload, "DELETE_MOVIE title=\"%199[^\"]\"", title);
 
-    // 2. Tìm vị trí phim (Giờ đây nó đã hỗ trợ không phân biệt hoa thường)
+    // 2. Tìm vị trí phim
     int index = find_movie_by_title(title);
 
     if (index < 0)

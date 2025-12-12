@@ -28,6 +28,8 @@ typedef enum
     DELETE_USER,
     SET_ROLE,
 
+    EXIT,
+
     UNKNOWN
 } CommandType;
 
