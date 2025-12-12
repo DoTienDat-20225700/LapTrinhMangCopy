@@ -5,3 +5,4 @@ user 123123 user
 admin 123123 admin
 ha 123123 user
 user1 123123 user
+user2 123 user

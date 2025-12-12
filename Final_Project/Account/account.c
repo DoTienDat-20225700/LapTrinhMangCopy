@@ -162,15 +162,7 @@ void handle_delete_user(const char *payload, char *response_out)
 {
     char username[MAX_USERNAME];
     sscanf(payload, "DELETE_USER username=%s", username);
-    int index = -1;
-    for (int i = 0; i < user_count; i++)
-    {
-        if (strcmp(users[i].username, username) == 0)
-        {
-            index = i;
-            break;
-        }
-    }
+    int index = find_user(username);
     if (index == -1)
     {
         sprintf(response_out, "User not found: %s", username);
@@ -195,15 +187,7 @@ void handle_set_role(const char *payload, char *response_out)
         strcpy(response_out, "Invalid role (must be 'admin' or 'user')");
         return;
     }
-    int index = -1;
-    for (int i = 0; i < user_count; i++)
-    {
-        if (strcmp(users[i].username, username) == 0)
-        {
-            index = i;
-            break;
-        }
-    }
+    int index = find_user(username);
     if (index == -1)
     {
         sprintf(response_out, "User not found: %s", username);

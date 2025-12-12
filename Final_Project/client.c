@@ -9,6 +9,13 @@
 #define PORT 1255
 #define MAXLINE 4096
 
+void clear_buffer()
+{
+    int c;
+    while ((c = getchar()) != '\n' && c != EOF)
+        ;
+}
+
 void send_and_receive(int sockfd, struct sockaddr_in *servaddr, const char *message, char *response)
 {
     socklen_t len = sizeof(*servaddr);
@@ -29,14 +36,12 @@ void handle_authentication(int sockfd, struct sockaddr_in *servaddr, char *role_
     char buffer[MAXLINE], response[MAXLINE];
     char username[50], password[50];
     int choice;
-    int c; // Biến dùng để clear buffer
 
     while (1)
     {
         printf("\nWelcome!\n1. Login\n2. Register\n3. Exit\n> ");
         scanf("%d", &choice);
-        while ((c = getchar()) != '\n' && c != EOF)
-            ; // Clear buffer sau scanf
+        clear_buffer();
 
         if (choice == 1)
         {
@@ -106,7 +111,6 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
 {
     int choice;
     char buffer[MAXLINE], response[MAXLINE];
-    int c;
 
     while (1)
     {
@@ -123,8 +127,8 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         printf("10. Set User Role\n");
         printf("11. Exit\n> ");
         scanf("%d", &choice);
-        while ((c = getchar()) != '\n' && c != EOF)
-            ; // Clear buffer sau scanf
+        clear_buffer();
+        ; // Clear buffer sau scanf
 
         if (choice == 11)
         {
@@ -165,8 +169,8 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
             char new_genre[50];
             printf("Enter Movie ID to update: ");
             scanf("%d", &id);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ; // Xóa buffer
+            clear_buffer();
+            ; // Xóa buffer
 
             printf("New Genre: ");
             fgets(new_genre, sizeof(new_genre), stdin);
@@ -186,8 +190,7 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
 
             printf("Enter Movie ID: ");
             scanf("%d", &id);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ; // Xóa bộ đệm
+            clear_buffer(); // Xóa bộ đệm
 
             printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -206,8 +209,7 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
             char day[20], time[100];
             printf("Enter Movie ID: ");
             scanf("%d", &id);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ;
+            clear_buffer();
 
             printf("Day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -231,8 +233,7 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
             char day[20], time[20];
             printf("Enter Movie ID: ");
             scanf("%d", &id);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ;
+            clear_buffer();
 
             printf("Day: ");
             fgets(day, sizeof(day), stdin);
@@ -281,7 +282,6 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 {
     int choice;
     char buffer[MAXLINE], response[MAXLINE];
-    int c;
 
     while (1)
     {
@@ -292,8 +292,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
         printf("4. Purchase tickets\n");
         printf("5. Exit\n> ");
         scanf("%d", &choice);
-        while ((c = getchar()) != '\n' && c != EOF)
-            ; // Clear buffer
+        clear_buffer();
 
         switch (choice)
         {
@@ -321,8 +320,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
             printf("Filter options:\n1. By genre\n2. By time\n> ");
             int filter_choice;
             scanf("%d", &filter_choice);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ; // flush newline
+            clear_buffer();
 
             if (filter_choice == 1)
             {
@@ -335,8 +333,8 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 int genre_id;
                 printf("Enter genre ID (number): ");
                 scanf("%d", &genre_id);
-                while ((c = getchar()) != '\n' && c != EOF)
-                    ; // Xóa bộ đệm
+                clear_buffer();
+
                 printf("Filtering genre ID: %d\n", genre_id);
 
                 // 3. Gửi ID lên server
@@ -369,13 +367,11 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
             int mid, row, col, book_choice;
             char time[20], day[50];
             char ticket_info[MAXLINE];
-            int c;
 
             // Yêu cầu nhập ID
             printf("Enter Movie ID: ");
             scanf("%d", &mid);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ;
+            clear_buffer();
 
             printf("Enter day (e.g., Thu 2): ");
             fgets(day, sizeof(day), stdin);
@@ -383,8 +379,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
             printf("Enter time (e.g., 7h): ");
             scanf("%s", time);
-            while ((c = getchar()) != '\n' && c != EOF)
-                ;
+            clear_buffer();
 
             // Hiện sơ đồ ghế ban đầu
             sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", mid, day, time);
@@ -400,8 +395,7 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 scanf("%d", &row);
                 printf("Column (1-5): ");
                 scanf("%d", &col);
-                while ((c = getchar()) != '\n' && c != EOF)
-                    ;
+                clear_buffer();
 
                 // 1. Gửi lệnh Book vé
                 sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", mid, day, time, row, col);
@@ -421,8 +415,8 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
                 printf("1. Yes\n");
                 printf("2. No\n ");
                 scanf("%d", &book_choice);
-                while ((c = getchar()) != '\n' && c != EOF)
-                    ;
+                clear_buffer();
+
             } while (book_choice == 1);
             break;
         }
