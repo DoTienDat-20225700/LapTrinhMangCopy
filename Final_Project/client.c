@@ -85,7 +85,7 @@ void handle_authentication(int sockfd, struct sockaddr_in *servaddr, char *role_
             }
             else
             {
-                printf("Failed to create account.\n");
+                printf("Failed to create account. Username exists.\n");
             }
         }
         else if (choice == 3)

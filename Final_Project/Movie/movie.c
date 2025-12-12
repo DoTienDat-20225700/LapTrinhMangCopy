@@ -224,6 +224,8 @@ int load_movies(const char *filename, Movie *movies, int max_movies)
     char line[4096];
     int count = 0;
 
+    printf("Server: Loading database from %s...\n", filename);
+
     while (fgets(line, sizeof(line), fp) && count < max_movies)
     {
         // Xóa ký tự xuống dòng
@@ -294,13 +296,10 @@ int load_movies(const char *filename, Movie *movies, int max_movies)
                 day_block = strtok_r(NULL, ";", &sp2);
             }
         }
-
-        // In nhẹ nhàng để biết đã load được phim nào
-        printf("Server: Loaded Movie [%d] %s\n", movies[count].id, movies[count].title);
         count++;
     }
     fclose(fp);
-    printf("Server: Database ready. Total %d movies.\n", count);
+    printf("Server: Database ready. Total %d movies loaded successfully.\n", count);
     return count;
 }
 
