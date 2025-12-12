@@ -9,3 +9,23 @@
 9|Trò Chơi Ảo Giác: Ares|Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu|118|Thứ 2:7h,9h,17h,20h,22h;Thứ 3:10h,14h,16h,22h;Thứ 4:7h,9h,17h,20h,22h;Thứ 5:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h;Thứ 7:10h,14h,16h,22h
 10|Tay Anh Giữ Một Vì Sao|Hài, Tình Cảm|117|Thứ 2:7h,9h,17h,20h;Thứ 5:10h,14h,16h,22h;Thứ 7:10h,14h,16h
 11|Đất Rừng Phương Nam|Phiêu Lưu|110|Thứ 3:10h,14h,16h,22h;Thứ 6:7h,9h,17h,20h,22h
+12|Mai|Tâm Lý|131|Thứ 2:10h,19h;Thứ 7:14h,18h,21h
+13|Lật Mặt 7: Một Điều Ước|Gia Đình|138|Thứ 4:9h,15h;Chủ Nhật:10h,14h,19h,22h
+14|Dune: Hành Tinh Cát 2|Viễn Tưởng|166|Thứ 5:18h,21h;Thứ 6:19h,23h
+15|Godzilla x Kong: Đế Chế Mới|Hành Động|115|Thứ 3:11h,15h;Thứ 7:9h,13h,17h,20h
+16|Kung Fu Panda 4|Hoạt Hình|94|Thứ 2:10h,14h;Thứ 7:8h,10h,14h,18h
+17|Quật Mộ Trùng Ma|Kinh Dị|134|Thứ 4:20h,23h;Thứ 6:18h,21h,23h
+18|Gia Tài Của Ngoại|Tâm Lý|127|Thứ 3:14h,19h;Chủ Nhật:11h,16h,20h
+19|Doraemon: Bản Giao Hưởng Địa Cầu|Hoạt Hình|115|Thứ 5:17h;Thứ 7:9h,11h,15h
+20|Furiosa: Câu Chuyện Từ Max Điên|Hành Động|148|Thứ 2:13h,18h;Thứ 6:19h,22h
+21|Inside Out 2|Hoạt Hình|100|Thứ 4:10h,16h;Chủ Nhật:9h,13h,17h,19h
+22|Vây Hãm: Kẻ Trừng Phạt|Hành Động|109|Thứ 3:19h,21h;Thứ 7:20h,22h
+23|Cửu Long Thành Trại|Hành Động|126|Thứ 5:15h,20h;Thứ 6:18h,21h
+24|Móng Vuốt|Kinh Dị|110|Thứ 2:20h;Thứ 7:19h,21h,23h
+25|Garfield: Mèo Béo Siêu Quậy|Hoạt Hình|101|Thứ 4:18h;Chủ Nhật:8h,10h,14h
+26|Bố Già|Tâm Lý|128|Thứ 3:10h,15h;Thứ 6:14h,19h,21h
+27|Nhà Bà Nữ|Tâm Lý|102|Thứ 5:11h,16h;Thứ 7:13h,18h,20h,22h
+28|Avengers: Endgame|Hành Động|181|Thứ 2:18h;Thứ 7:14h,18h,21h
+29|Parasite: Ký Sinh Trùng|Kịch Tính|132|Thứ 4:19h;Chủ Nhật:15h,18h,21h
+30|Interstellar|Viễn Tưởng|169|Thứ 3:18h,21h;Thứ 6:19h,22h
+31|Titanic|Lãng Mạn|195|Thứ 5:18h;Chủ Nhật:13h,17h,20h
