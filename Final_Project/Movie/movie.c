@@ -484,6 +484,7 @@ void handle_list_movies(char *response_out)
 void handle_search(const char *payload, char *response_out)
 {
     char title[MAX_TITLE];
+    // Parse tên phim cần tìm từ payload
     sscanf(payload, "SEARCH title=%[^\n]", title);
 
     strcpy(response_out, "");
@@ -491,11 +492,53 @@ void handle_search(const char *payload, char *response_out)
 
     for (int i = 0; i < movie_count; i++)
     {
+        // Kiểm tra nếu tên phim chứa từ khóa tìm kiếm
         if (stristr(movie_cache[i].title, title) != NULL)
         {
+            // --- LOGIC MỚI: Xây dựng chuỗi lịch chiếu ---
+            char schedule_str[512] = "";
+            for (int d = 0; d < MAX_DAYS; d++)
+            {
+                int has_day = 0;
+                for (int s = 0; s < MAX_SLOTS; s++)
+                {
+                    if (strlen(movie_cache[i].schedule[d][s]) > 0)
+                    {
+                        if (!has_day)
+                        {
+                            // Nếu đã có ngày trước đó thì thêm dấu chấm phẩy ngăn cách
+                            if (strlen(schedule_str) > 0)
+                                strcat(schedule_str, "; ");
+
+                            // Thêm tên thứ (VD: Thứ 2: )
+                            strcat(schedule_str, get_day_name(d));
+                            strcat(schedule_str, ": ");
+                            has_day = 1;
+                        }
+                        else
+                        {
+                            // Ngăn cách các giờ bằng dấu phẩy
+                            strcat(schedule_str, ", ");
+                        }
+                        // Thêm giờ chiếu
+                        strcat(schedule_str, movie_cache[i].schedule[d][s]);
+                    }
+                }
+            }
+            if (strlen(schedule_str) == 0)
+                strcpy(schedule_str, "Chưa có lịch chiếu");
+            // ---------------------------------------------
+
             char match_info[MAXLINE];
-            sprintf(match_info, "Title: %s\nGenre: %s\nDuration: %d mins\n\n",
-                    movie_cache[i].title, movie_cache[i].genre, movie_cache[i].duration);
+            // Format output có thêm ID và Schedule
+            sprintf(match_info, "[ID: %d] Title: %s\nGenre: %s\nDuration: %d mins\nSchedule: %s\n\n",
+                    movie_cache[i].id,
+                    movie_cache[i].title,
+                    movie_cache[i].genre,
+                    movie_cache[i].duration,
+                    schedule_str);
+
+            // Kiểm tra bộ đệm để tránh tràn
             if (strlen(response_out) + strlen(match_info) < MAXLINE)
             {
                 strcat(response_out, match_info);
@@ -503,6 +546,7 @@ void handle_search(const char *payload, char *response_out)
             }
         }
     }
+
     if (found_count == 0)
     {
         strcpy(response_out, "NOT_FOUND");
@@ -691,8 +735,9 @@ void handle_get_seatmap(const char *payload, char *response_out)
     int movie_id;
     char day[50], time[20];
 
-    // Parse input: hỗ trợ dấu ngoặc kép
+    // 1. Parse input: lấy thông tin phim, ngày, giờ
     sscanf(payload, "GET_SEATMAP id=%d day=\"%[^\"]\" start=%s", &movie_id, day, time);
+
     int movie_index = find_movie_by_id(movie_id);
     if (movie_index == -1)
     {
@@ -714,27 +759,85 @@ void handle_get_seatmap(const char *payload, char *response_out)
         return;
     }
 
+    // 2. Bắt đầu vẽ Seatmap
     strcpy(response_out, "");
+
+    // --- Header: In số cột (1  2  3  4  5) ---
+    strcat(response_out, "   "); // Khoảng trống đầu dòng để chừa chỗ cho cột tên hàng (A, B...)
+
+    // Lưu ý: Mình dùng số 5 (số cột) và 3 (số hàng) theo code mẫu của bạn.
+    // Nếu trong file .h có define MAX_ROWS/MAX_COLS thì nên dùng constant đó.
+    for (int c = 0; c < 5; c++)
+    {
+        char col_num[10];
+        sprintf(col_num, "%-3d", c + 1); // %-3d: in số và căn trái trong khoảng 3 ký tự
+        strcat(response_out, col_num);
+    }
+    strcat(response_out, "\n");
+
+    // --- Body: In từng hàng ghế ---
     for (int r = 0; r < 3; r++)
     {
-        strcat(response_out, "|");
+        // a. In tên hàng (A, B, C...)
+        char row_label[10];
+        sprintf(row_label, "%c  ", 'A' + r); // 'A' + 0 = A, 'A' + 1 = B...
+        strcat(response_out, row_label);
+
+        // b. In các ghế
         for (int c = 0; c < 5; c++)
         {
-            char seat[10];
-            sprintf(seat, "%c|", movie_cache[movie_index].seatmap[day_index][time_index][r][c] == 'x' ? 'x' : ' ');
-            strcat(response_out, seat);
+            // Kiểm tra trạng thái ghế trong database
+            char status = movie_cache[movie_index].seatmap[day_index][time_index][r][c];
+
+            if (status == 'x')
+            {
+                strcat(response_out, "[x]"); // Ghế đã đặt
+            }
+            else
+            {
+                strcat(response_out, "[ ]"); // Ghế trống
+            }
         }
-        strcat(response_out, "\n");
+        strcat(response_out, "\n"); // Xuống dòng sau khi in hết 1 hàng
     }
 }
 
 void handle_book_seat(const char *payload, char *response_out)
 {
-    int row, col, movie_id;
+    int col, movie_id;
     char day[50], time[20];
+    char row_input[10]; // Biến tạm để chứa input hàng (có thể là "1" hoặc "A")
+    int row_int = 0;    // Biến lưu số hàng sau khi đã chuẩn hóa (1, 2, 3)
 
     // 1. Parse input
-    sscanf(payload, "BOOK_SEAT id=%d day=\"%[^\"]\" time=%s row=%d col=%d", &movie_id, day, time, &row, &col);
+    // Lưu ý: đổi row=%d thành row=%s để nhận cả chữ và số
+    int fields_read = sscanf(payload, "BOOK_SEAT id=%d day=\"%[^\"]\" time=%s row=%s col=%d",
+                             &movie_id, day, time, row_input, &col);
+
+    if (fields_read != 5)
+    {
+        sprintf(response_out, "Error: Invalid command format.");
+        return;
+    }
+
+    // --- LOGIC MỚI: Xử lý input Row (Chữ hoặc Số) ---
+    if (isdigit(row_input[0]))
+    {
+        // Trường hợp nhập số: "1", "2" -> chuyển thành int
+        row_int = atoi(row_input);
+    }
+    else if (isalpha(row_input[0]))
+    {
+        // Trường hợp nhập chữ: "A", "a" -> chuyển thành 1
+        // "B", "b" -> chuyển thành 2
+        char c = toupper(row_input[0]); // Đổi sang in hoa cho dễ xử lý
+        row_int = c - 'A' + 1;          // 'A' - 'A' + 1 = 1
+    }
+    else
+    {
+        row_int = -1; // Ký tự không hợp lệ
+    }
+    // ------------------------------------------------
 
     // 2. Validate
     int movie_index = find_movie_by_id(movie_id);
@@ -758,25 +861,28 @@ void handle_book_seat(const char *payload, char *response_out)
         return;
     }
 
-    if (row < 1 || row > 3 || col < 1 || col > 5)
+    // Kiểm tra toạ độ ghế (Hàng 1-3, Cột 1-5)
+    // Lưu ý: Bây giờ ta dùng biến row_int để kiểm tra
+    if (row_int < 1 || row_int > 3 || col < 1 || col > 5)
     {
-        sprintf(response_out, "Invalid seat position (Row 1-3, Col 1-5)");
+        sprintf(response_out, "Invalid seat position. Row must be 1-3 or A-C, Col must be 1-5.");
         return;
     }
 
-    if (movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] == 'x')
+    // Kiểm tra ghế đã đặt chưa (Dùng row_int)
+    if (movie_cache[movie_index].seatmap[day_index][time_index][row_int - 1][col - 1] == 'x')
     {
-        sprintf(response_out, "Failed: Seat (%d,%d) is already booked!", row, col);
+        sprintf(response_out, "Failed: Seat %c%d is already booked!", 'A' + (row_int - 1), col);
         return;
     }
 
     // 3. Đặt ghế & Lưu
-    movie_cache[movie_index].seatmap[day_index][time_index][row - 1][col - 1] = 'x';
+    movie_cache[movie_index].seatmap[day_index][time_index][row_int - 1][col - 1] = 'x';
     save_bookings();
 
+    // Xử lý hiển thị thời gian
     int h = 0, m = 0;
     char *sep = strpbrk(time, "h:");
-
     if (sep != NULL)
     {
         *sep = '\0';
@@ -789,22 +895,24 @@ void handle_book_seat(const char *payload, char *response_out)
         h = atoi(time);
         m = 0;
     }
-
     char display_time[20];
     sprintf(display_time, "%02dh%02d", h, m);
 
     // 4. In vé
+    // Chuyển lại thành chữ cái để in ra vé cho đẹp
+    char row_char = 'A' + (row_int - 1);
+
     sprintf(response_out,
             "SUCCESS\n"
             "***************************************\n"
-            "* MOVIE TICKET              *\n"
+            "* MOVIE TICKET             *\n"
             "***************************************\n"
             "  Movie : %s\n"
-            "  Day : %s\n"
+            "  Day   : %s\n"
             "  Time  : %s\n"
-            "  Seat  : Row %d - Col %d\n"
+            "  Seat  : Row %c - Col %d\n"
             "***************************************",
-            movie_cache[movie_index].title, day, display_time, row, col);
+            movie_cache[movie_index].title, day, display_time, row_char, col);
 }
 
 // --- CÁC HÀM ADMIN ---

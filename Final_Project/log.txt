@@ -1,0 +1,728 @@
+[Mon Dec 22 14:41:38 2025] RECV: LOGIN username=user password=123123
+[Mon Dec 22 14:41:38 2025] SEND: SUCCESS role=user
+[Mon Dec 22 14:42:08 2025] RECV: LIST_MOVIES
+[Mon Dec 22 14:42:08 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+
+[ID: 2] Title: Cục Vàng Của Ngoại
+Genre: Gia Đình, Tâm Lý
+Duration: 119 mins
+
+[ID: 3] Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+
+[ID: 4] Title: Phỏng Vấn Sát Nhân
+Genre: Hồi Hộp, Kịch Tính, Tội Phạm
+Duration: 107 mins
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+
+[ID: 6] Title: Tee Yod: Quỷ Ăn Tạng
+Genre: Kinh Dị
+Duration: 104 mins
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+
+[ID: 11] Title: Đất Rừng Phương Nam
+Genre: Phiêu Lưu
+Duration: 110 mins
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+
+[ID: 13] Title: Lật Mặt 7: Một Điều Ước
+Genre: Gia Đình
+Duration: 138 mins
+
+[ID: 14] Title: Dune: Hành Tinh Cát 2
+Genre: Viễn Tưởng
+Duration: 166 mins
+
+[ID: 15] Title: Godzilla x Kong: Đế Chế Mới
+Genre: Hành Động
+Duration: 115 mins
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+
+[ID: 17] Title: Quật Mộ Trùng Ma
+Genre: Kinh Dị
+Duration: 134 mins
+
+[ID: 18] Title: Gia Tài Của Ngoại
+Genre: Tâm Lý
+Duration: 127 mins
+
+[ID: 19] Title: Doraemon: Bản Giao Hưởng Địa Cầu
+Genre: Hoạt Hình
+Duration: 115 mins
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+
+[ID: 21] Title: Inside Out 2
+Genre: Hoạt Hình
+Duration: 100 mins
+
+[ID: 22] Title: Vây Hãm: Kẻ Trừng Phạt
+Genre: Hành Động
+Duration: 109 mins
+
+[ID: 23] Title: Cửu Long Thành Trại
+Genre: Hành Động
+Duration: 126 mins
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+
+[ID: 25] Title: Garfield: Mèo Béo Siêu Quậy
+Genre: Hoạt Hình
+Duration: 101 mins
+
+[ID: 26] Title: Bố Già
+Genre: Tâm Lý
+Duration: 128 mins
+
+[ID: 27] Title: Nhà Bà Nữ
+Genre: Tâm Lý
+Duration: 102 mins
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+
+[ID: 29] Title: Parasite: Ký Sinh Trùng
+Genre: Kịch Tính
+Duration: 132 mins
+
+[ID: 30] Title: Interstellar
+Genre: Viễn Tưởng
+Duration: 169 mins
+
+[ID: 31] Title: Titanic
+Genre: Lãng Mạn
+Duration: 195 mins
+
+
+[Mon Dec 22 14:42:20 2025] RECV: SEARCH title=gió
+[Mon Dec 22 14:42:20 2025] SEND: Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+
+
+[Mon Dec 22 14:42:41 2025] RECV: LIST_GENRES
+[Mon Dec 22 14:42:41 2025] SEND: Available genres:
+1. Kinh Dị
+2. Gia Đình
+3. Tâm Lý
+4. Hoạt Hình
+5. Hồi Hộp
+6. Kịch Tính
+7. Tội Phạm
+8. Hành Động
+9. Hoà Nhạc
+10. Phim Tài Liệu
+11. Thần Thoại
+12. Tình Cảm
+13. Khoa Học Viễn Tưởng
+14. Phiêu Lưu
+15. Hài
+16. Viễn Tưởng
+17. Lãng Mạn
+
+[Mon Dec 22 14:47:22 2025] RECV: FILTER_GENRE id=12
+[Mon Dec 22 14:47:22 2025] SEND: --- Movies with genre: Tình Cảm ---
+[ID: 8] Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+
+[ID: 10] Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+
+
+[Mon Dec 22 14:48:21 2025] RECV: GET_SEATMAP id=10 day="thứ 2" start=10h
+[Mon Dec 22 14:48:21 2025] SEND: Time slot not found: 10h
+[Mon Dec 22 14:49:57 2025] RECV: FILTER_TIME day="thứ 2" begin=10 end=22
+[Mon Dec 22 14:49:57 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+Schedule: 12h00 - 14h30, 15h00 - 17h30
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+Schedule: 17h00 - 18h58, 20h00 - 21h58
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+Schedule: 17h00 - 19h00, 20h00 - 22h00
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+Schedule: 17h00 - 18h52, 20h00 - 21h52
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+Schedule: 17h00 - 18h58, 20h00 - 21h58
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+Schedule: 17h00 - 18h57, 20h00 - 21h57
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+Schedule: 10h00 - 12h11, 19h00 - 21h11
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+Schedule: 10h00 - 11h34, 14h00 - 15h34
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+Schedule: 13h00 - 15h28, 18h00 - 20h28
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+Schedule: 20h00 - 21h50
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+Schedule: 18h00 - 21h01
+
+
+[Mon Dec 22 15:00:19 2025] RECV: EXIT
+[Mon Dec 22 15:00:19 2025] SEND: Goodbye! See you again.
+[Mon Dec 22 15:00:53 2025] RECV: LOGIN username=dat password=123456
+[Mon Dec 22 15:00:53 2025] SEND: SUCCESS role=admin
+[Mon Dec 22 15:02:32 2025] RECV: EXIT
+[Mon Dec 22 15:02:32 2025] SEND: Goodbye! See you again.
+[Mon Dec 22 15:06:19 2025] RECV: CREATE_ACCOUNT username=hieuh password=123 role=user
+[Mon Dec 22 15:06:19 2025] SEND: SUCCESS
+[Mon Dec 22 15:06:24 2025] RECV: LOGIN username=hieuh password=122
+[Mon Dec 22 15:06:24 2025] SEND: FAIL
+[Mon Dec 22 15:06:35 2025] RECV: LOGIN username=hieuh password=123
+[Mon Dec 22 15:06:35 2025] SEND: SUCCESS role=user
+[Mon Dec 22 15:06:39 2025] RECV: LIST_MOVIES
+[Mon Dec 22 15:06:39 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+
+[ID: 2] Title: Cục Vàng Của Ngoại
+Genre: Gia Đình, Tâm Lý
+Duration: 119 mins
+
+[ID: 3] Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+
+[ID: 4] Title: Phỏng Vấn Sát Nhân
+Genre: Hồi Hộp, Kịch Tính, Tội Phạm
+Duration: 107 mins
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+
+[ID: 6] Title: Tee Yod: Quỷ Ăn Tạng
+Genre: Kinh Dị
+Duration: 104 mins
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+
+[ID: 11] Title: Đất Rừng Phương Nam
+Genre: Phiêu Lưu
+Duration: 110 mins
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+
+[ID: 13] Title: Lật Mặt 7: Một Điều Ước
+Genre: Gia Đình
+Duration: 138 mins
+
+[ID: 14] Title: Dune: Hành Tinh Cát 2
+Genre: Viễn Tưởng
+Duration: 166 mins
+
+[ID: 15] Title: Godzilla x Kong: Đế Chế Mới
+Genre: Hành Động
+Duration: 115 mins
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+
+[ID: 17] Title: Quật Mộ Trùng Ma
+Genre: Kinh Dị
+Duration: 134 mins
+
+[ID: 18] Title: Gia Tài Của Ngoại
+Genre: Tâm Lý
+Duration: 127 mins
+
+[ID: 19] Title: Doraemon: Bản Giao Hưởng Địa Cầu
+Genre: Hoạt Hình
+Duration: 115 mins
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+
+[ID: 21] Title: Inside Out 2
+Genre: Hoạt Hình
+Duration: 100 mins
+
+[ID: 22] Title: Vây Hãm: Kẻ Trừng Phạt
+Genre: Hành Động
+Duration: 109 mins
+
+[ID: 23] Title: Cửu Long Thành Trại
+Genre: Hành Động
+Duration: 126 mins
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+
+[ID: 25] Title: Garfield: Mèo Béo Siêu Quậy
+Genre: Hoạt Hình
+Duration: 101 mins
+
+[ID: 26] Title: Bố Già
+Genre: Tâm Lý
+Duration: 128 mins
+
+[ID: 27] Title: Nhà Bà Nữ
+Genre: Tâm Lý
+Duration: 102 mins
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+
+[ID: 29] Title: Parasite: Ký Sinh Trùng
+Genre: Kịch Tính
+Duration: 132 mins
+
+[ID: 30] Title: Interstellar
+Genre: Viễn Tưởng
+Duration: 169 mins
+
+[ID: 31] Title: Titanic
+Genre: Lãng Mạn
+Duration: 195 mins
+
+
+[Mon Dec 22 15:07:12 2025] RECV: SEARCH title=mong
+[Mon Dec 22 15:07:12 2025] SEND: NOT_FOUND
+[Mon Dec 22 15:07:38 2025] RECV: SEARCH title=móng
+[Mon Dec 22 15:07:38 2025] SEND: Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+
+
+[Mon Dec 22 15:12:37 2025] RECV: LIST_GENRES
+[Mon Dec 22 15:12:37 2025] SEND: Available genres:
+1. Kinh Dị
+2. Gia Đình
+3. Tâm Lý
+4. Hoạt Hình
+5. Hồi Hộp
+6. Kịch Tính
+7. Tội Phạm
+8. Hành Động
+9. Hoà Nhạc
+10. Phim Tài Liệu
+11. Thần Thoại
+12. Tình Cảm
+13. Khoa Học Viễn Tưởng
+14. Phiêu Lưu
+15. Hài
+16. Viễn Tưởng
+17. Lãng Mạn
+
+[Mon Dec 22 15:12:48 2025] RECV: FILTER_GENRE id=3
+[Mon Dec 22 15:12:48 2025] SEND: --- Movies with genre: Tâm Lý ---
+[ID: 2] Cục Vàng Của Ngoại
+Genre: Gia Đình, Tâm Lý
+Duration: 119 mins
+
+[ID: 12] Mai
+Genre: Tâm Lý
+Duration: 131 mins
+
+[ID: 18] Gia Tài Của Ngoại
+Genre: Tâm Lý
+Duration: 127 mins
+
+[ID: 26] Bố Già
+Genre: Tâm Lý
+Duration: 128 mins
+
+[ID: 27] Nhà Bà Nữ
+Genre: Tâm Lý
+Duration: 102 mins
+
+
+[Mon Dec 22 15:13:16 2025] RECV: FILTER_TIME day="thứ 2" begin=12h end=2h
+[Mon Dec 22 15:13:16 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+Schedule: 12h00 - 14h30, 15h00 - 17h30, 20h00 - 22h30, 22h00 - 00h30
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+Schedule: 17h00 - 18h58, 20h00 - 21h58, 22h00 - 23h58
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+Schedule: 17h00 - 19h00, 20h00 - 22h00, 22h00 - 00h00
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+Schedule: 17h00 - 18h52, 20h00 - 21h52
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+Schedule: 17h00 - 18h58, 20h00 - 21h58, 22h00 - 23h58
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+Schedule: 17h00 - 18h57, 20h00 - 21h57
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+Schedule: 19h00 - 21h11
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+Schedule: 14h00 - 15h34
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+Schedule: 13h00 - 15h28, 18h00 - 20h28
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+Schedule: 20h00 - 21h50
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+Schedule: 18h00 - 21h01
+
+
+[Mon Dec 22 15:15:47 2025] RECV: GET_SEATMAP id=28 day="thứ 2" start=18
+[Mon Dec 22 15:15:47 2025] SEND: | | | | | |
+| | | | | |
+| | | | | |
+
+[Mon Dec 22 15:15:49 2025] RECV: BOOK_SEAT id=28 day="thứ 2" time=18 row=1 col=1
+[Mon Dec 22 15:15:49 2025] SEND: SUCCESS
+***************************************
+* MOVIE TICKET              *
+***************************************
+  Movie : Avengers: Endgame
+  Day : thứ 2
+  Time  : 18h00
+  Seat  : Row 1 - Col 1
+***************************************
+[Mon Dec 22 15:15:49 2025] RECV: GET_SEATMAP id=28 day="thứ 2" start=18
+[Mon Dec 22 15:15:49 2025] SEND: |x| | | | |
+| | | | | |
+| | | | | |
+
+[Mon Dec 22 15:16:52 2025] RECV: EXIT
+[Mon Dec 22 15:16:52 2025] SEND: Goodbye! See you again.
+[Mon Dec 22 15:18:42 2025] RECV: LOGIN username=admin password=123123
+[Mon Dec 22 15:18:42 2025] SEND: SUCCESS role=admin
+[Mon Dec 22 15:19:34 2025] RECV: ADD_MOVIE title="Avatar 3" genre="Viễn tưởng" duration=200
+[Mon Dec 22 15:19:34 2025] SEND: SUCCESS: Movie added (ID: 32)
+[Mon Dec 22 15:19:37 2025] RECV: LIST_MOVIES
+[Mon Dec 22 15:19:37 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+
+[ID: 2] Title: Cục Vàng Của Ngoại
+Genre: Gia Đình, Tâm Lý
+Duration: 119 mins
+
+[ID: 3] Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+
+[ID: 4] Title: Phỏng Vấn Sát Nhân
+Genre: Hồi Hộp, Kịch Tính, Tội Phạm
+Duration: 107 mins
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+
+[ID: 6] Title: Tee Yod: Quỷ Ăn Tạng
+Genre: Kinh Dị
+Duration: 104 mins
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+
+[ID: 11] Title: Đất Rừng Phương Nam
+Genre: Phiêu Lưu
+Duration: 110 mins
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+
+[ID: 13] Title: Lật Mặt 7: Một Điều Ước
+Genre: Gia Đình
+Duration: 138 mins
+
+[ID: 14] Title: Dune: Hành Tinh Cát 2
+Genre: Viễn Tưởng
+Duration: 166 mins
+
+[ID: 15] Title: Godzilla x Kong: Đế Chế Mới
+Genre: Hành Động
+Duration: 115 mins
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+
+[ID: 17] Title: Quật Mộ Trùng Ma
+Genre: Kinh Dị
+Duration: 134 mins
+
+[ID: 18] Title: Gia Tài Của Ngoại
+Genre: Tâm Lý
+Duration: 127 mins
+
+[ID: 19] Title: Doraemon: Bản Giao Hưởng Địa Cầu
+Genre: Hoạt Hình
+Duration: 115 mins
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+
+[ID: 21] Title: Inside Out 2
+Genre: Hoạt Hình
+Duration: 100 mins
+
+[ID: 22] Title: Vây Hãm: Kẻ Trừng Phạt
+Genre: Hành Động
+Duration: 109 mins
+
+[ID: 23] Title: Cửu Long Thành Trại
+Genre: Hành Động
+Duration: 126 mins
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+
+[ID: 25] Title: Garfield: Mèo Béo Siêu Quậy
+Genre: Hoạt Hình
+Duration: 101 mins
+
+[ID: 26] Title: Bố Già
+Genre: Tâm Lý
+Duration: 128 mins
+
+[ID: 27] Title: Nhà Bà Nữ
+Genre: Tâm Lý
+Duration: 102 mins
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+
+[ID: 29] Title: Parasite: Ký Sinh Trùng
+Genre: Kịch Tính
+Duration: 132 mins
+
+[ID: 30] Title: Interstellar
+Genre: Viễn Tưởng
+Duration: 169 mins
+
+[ID: 31] Title: Titanic
+Genre: Lãng Mạn
+Duration: 195 mins
+
+[ID: 32] Title: Avatar 3
+Genre: Viễn tưởng
+Duration: 200 mins
+
+
+[Mon Dec 22 15:22:53 2025] RECV: DELETE_MOVIE id=32
+[Mon Dec 22 15:22:53 2025] SEND: SUCCESS: Deleted movie ID 32
+[Mon Dec 22 15:24:30 2025] RECV: LOGIN username=admin password=123123
+[Mon Dec 22 15:24:30 2025] SEND: SUCCESS role=admin
+[Mon Dec 22 15:25:23 2025] RECV: ADD_SCHEDULE id=31 day="thứ 2" time="18"
+[Mon Dec 22 15:25:23 2025] SEND: SUCCESS: Added 1 schedules for ID 31
+[Mon Dec 22 15:27:00 2025] RECV: DELETE_SCHEDULE id=31 day="thứ 2" time="18"
+[Mon Dec 22 15:27:00 2025] SEND: SUCCESS: Deleted 1 schedule(s)
+[Mon Dec 22 15:27:35 2025] RECV: LIST_USERS
+[Mon Dec 22 15:27:35 2025] SEND: User: dat             | Role: admin
+User: ngoctran        | Role: user
+User: chien           | Role: user
+User: user            | Role: user
+User: admin           | Role: admin
+User: ha              | Role: user
+User: user1           | Role: user
+User: hieuh           | Role: user
+
+[Mon Dec 22 15:48:26 2025] RECV: EXIT
+[Mon Dec 22 15:48:26 2025] SEND: Goodbye! See you again.
+[Mon Dec 22 15:51:31 2025] RECV: CREATE_ACCOUNT username=user password=12341234 role=user
+[Mon Dec 22 15:51:31 2025] SEND: EXISTS
+[Mon Dec 22 17:45:47 2025] RECV: LOGIN username=user password=123123
+[Mon Dec 22 17:45:47 2025] SEND: SUCCESS role=user
+[Mon Dec 22 17:45:59 2025] RECV: SEARCH title=avenger
+[Mon Dec 22 17:45:59 2025] SEND: [ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+Schedule: Thứ 2: 18h; Thứ 7: 14h, 18h, 21h
+
+
+[Mon Dec 22 17:50:08 2025] RECV: EXIT
+[Mon Dec 22 17:50:08 2025] SEND: Goodbye! See you again.
+[Mon Dec 22 17:59:11 2025] RECV: LOGIN username=user password=123123
+[Mon Dec 22 17:59:11 2025] SEND: SUCCESS role=user
+[Mon Dec 22 17:59:16 2025] RECV: SEARCH title=gió
+[Mon Dec 22 17:59:16 2025] SEND: [ID: 3] Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+Schedule: Thứ 4: 7h, 12h, 15h, 20h, 22h; Thứ 5: 8h, 13h, 16h, 21h, 23h; Thứ 6: 12h
+
+
+[Mon Dec 22 17:59:40 2025] RECV: GET_SEATMAP id=3 day="thứ 4" start=7h
+[Mon Dec 22 17:59:40 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][ ]
+B  [ ][ ][ ][ ][ ]
+C  [ ][ ][ ][ ][ ]
+
+[Mon Dec 22 17:59:54 2025] RECV: BOOK_SEAT id=3 day="thứ 4" time=7h row=3 col=2
+[Mon Dec 22 17:59:54 2025] SEND: SUCCESS
+***************************************
+* MOVIE TICKET             *
+***************************************
+  Movie : Gió Vẫn Thổi
+  Day   : thứ 4
+  Time  : 07h00
+  Seat  : Row C - Col 2
+***************************************
+[Mon Dec 22 17:59:54 2025] RECV: GET_SEATMAP id=3 day="thứ 4" start=7h
+[Mon Dec 22 17:59:54 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][ ]
+B  [ ][ ][ ][ ][ ]
+C  [ ][x][ ][ ][ ]
+
+[Mon Dec 22 18:04:22 2025] RECV: LOGIN username=user password=123123
+[Mon Dec 22 18:04:22 2025] SEND: SUCCESS role=user
+[Mon Dec 22 18:04:31 2025] RECV: GET_SEATMAP id=1 day="thứ 2" start=7
+[Mon Dec 22 18:04:31 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][ ]
+B  [ ][ ][ ][ ][ ]
+C  [ ][ ][ ][ ][ ]
+
+[Mon Dec 22 18:05:32 2025] RECV: GET_SEATMAP id=1 day="thứ 2" start=7
+[Mon Dec 22 18:05:32 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][ ]
+B  [ ][ ][ ][ ][ ]
+C  [ ][ ][ ][ ][ ]
+
+[Mon Dec 22 18:08:29 2025] RECV: LOGIN username=user password=123123
+[Mon Dec 22 18:08:29 2025] SEND: SUCCESS role=user
+[Mon Dec 22 18:08:36 2025] RECV: GET_SEATMAP id=1 day="thứ 2" start=7
+[Mon Dec 22 18:08:36 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][ ]
+B  [ ][ ][ ][ ][ ]
+C  [ ][ ][ ][ ][ ]
+
+[Mon Dec 22 18:08:46 2025] RECV: BOOK_SEAT id=1 day="thứ 2" time=7 row=a col=5
+[Mon Dec 22 18:08:46 2025] SEND: SUCCESS
+***************************************
+* MOVIE TICKET             *
+***************************************
+  Movie : Nhà Ma Xó
+  Day   : thứ 2
+  Time  : 07h00
+  Seat  : Row A - Col 5
+***************************************
+[Mon Dec 22 18:08:46 2025] RECV: GET_SEATMAP id=1 day="thứ 2" start=7
+[Mon Dec 22 18:08:46 2025] SEND:    1  2  3  4  5  
+A  [ ][ ][ ][ ][x]
+B  [ ][ ][ ][ ][ ]
+C  [ ][ ][ ][ ][ ]
+

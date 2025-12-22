@@ -377,11 +377,12 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
         }
         case 4:
         {
-            int mid, row, col, book_choice;
+            int mid, col, book_choice;
+            char row_input[10];
             char time[20], day[50];
             char ticket_info[MAXLINE];
 
-            // Yêu cầu nhập ID
+            // Yêu cầu nhập ID phim
             if (!get_int("Enter Movie ID: ", &mid))
                 break;
 
@@ -403,23 +404,28 @@ void show_user_menu(int sockfd, struct sockaddr_in *servaddr)
 
             do
             {
-                if (!get_int("Row (1-3): ", &row))
-                    break;
+                // --- SỬA ĐỔI Ở ĐÂY ---
+                // Không dùng get_int nữa mà dùng scanf để nhận cả chữ và số
+                printf("Row (1-3 or A-C): ");
+                scanf("%s", row_input);
+                clear_buffer(); // Xóa bộ đệm sau khi nhập chuỗi
+
                 if (!get_int("Col (1-5): ", &col))
                     break;
 
                 // 1. Gửi lệnh Book vé
-                sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%d col=%d", mid, day, time, row, col);
+                // Lưu ý: row=%s (gửi chuỗi) thay vì row=%d
+                sprintf(buffer, "BOOK_SEAT id=%d day=\"%s\" time=%s row=%s col=%d", mid, day, time, row_input, col);
                 send_and_receive(sockfd, servaddr, buffer, ticket_info);
 
-                // 2. Gửi lệnh lấy Seatmap mới
+                // 2. Gửi lệnh lấy Seatmap mới để cập nhật hiển thị
                 sprintf(buffer, "GET_SEATMAP id=%d day=\"%s\" start=%s", mid, day, time);
                 send_and_receive(sockfd, servaddr, buffer, response);
 
                 // 3. In Seatmap
                 printf("Updated Seatmap:\n%s\n", response);
 
-                // 4. In vé
+                // 4. In kết quả đặt vé
                 printf("%s\n", ticket_info);
 
                 if (!get_int("Do you want to book more?\n 1.Yes\n 2.No\n> ", &book_choice))
