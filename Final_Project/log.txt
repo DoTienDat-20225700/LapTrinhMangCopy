@@ -726,3 +726,141 @@ A  [ ][ ][ ][ ][x]
 B  [ ][ ][ ][ ][ ]
 C  [ ][ ][ ][ ][ ]
 
+[Mon Dec 22 19:14:33 2025] RECV: LOGIN username=admin password=123456
+[Mon Dec 22 19:14:33 2025] SEND: FAIL
+[Mon Dec 22 19:14:44 2025] RECV: LOGIN username=admin password=123123
+[Mon Dec 22 19:14:44 2025] SEND: SUCCESS role=admin
+[Mon Dec 22 19:15:16 2025] RECV: LIST_MOVIES
+[Mon Dec 22 19:15:16 2025] SEND: [ID: 1] Title: Nhà Ma Xó
+Genre: Kinh Dị
+Duration: 150 mins
+
+[ID: 2] Title: Cục Vàng Của Ngoại
+Genre: Gia Đình, Tâm Lý
+Duration: 119 mins
+
+[ID: 3] Title: Gió Vẫn Thổi
+Genre: Hoạt Hình
+Duration: 127 mins
+
+[ID: 4] Title: Phỏng Vấn Sát Nhân
+Genre: Hồi Hộp, Kịch Tính, Tội Phạm
+Duration: 107 mins
+
+[ID: 5] Title: Tử Chiến Trên Không
+Genre: Hành Động, Hồi Hộp
+Duration: 118 mins
+
+[ID: 6] Title: Tee Yod: Quỷ Ăn Tạng
+Genre: Kinh Dị
+Duration: 104 mins
+
+[ID: 7] Title: Tổ Quốc Trong Tim: The Concert Film
+Genre: Hoà Nhạc, Phim Tài Liệu
+Duration: 120 mins
+
+[ID: 8] Title: Năm Của Anh, Ngày Của Em
+Genre: Thần Thoại, Tình Cảm
+Duration: 112 mins
+
+[ID: 9] Title: Trò Chơi Ảo Giác: Ares
+Genre: Hành Động, Khoa Học Viễn Tưởng, Phiêu Lưu
+Duration: 118 mins
+
+[ID: 10] Title: Tay Anh Giữ Một Vì Sao
+Genre: Hài, Tình Cảm
+Duration: 117 mins
+
+[ID: 11] Title: Đất Rừng Phương Nam
+Genre: Phiêu Lưu
+Duration: 110 mins
+
+[ID: 12] Title: Mai
+Genre: Tâm Lý
+Duration: 131 mins
+
+[ID: 13] Title: Lật Mặt 7: Một Điều Ước
+Genre: Gia Đình
+Duration: 138 mins
+
+[ID: 14] Title: Dune: Hành Tinh Cát 2
+Genre: Viễn Tưởng
+Duration: 166 mins
+
+[ID: 15] Title: Godzilla x Kong: Đế Chế Mới
+Genre: Hành Động
+Duration: 115 mins
+
+[ID: 16] Title: Kung Fu Panda 4
+Genre: Hoạt Hình
+Duration: 94 mins
+
+[ID: 17] Title: Quật Mộ Trùng Ma
+Genre: Kinh Dị
+Duration: 134 mins
+
+[ID: 18] Title: Gia Tài Của Ngoại
+Genre: Tâm Lý
+Duration: 127 mins
+
+[ID: 19] Title: Doraemon: Bản Giao Hưởng Địa Cầu
+Genre: Hoạt Hình
+Duration: 115 mins
+
+[ID: 20] Title: Furiosa: Câu Chuyện Từ Max Điên
+Genre: Hành Động
+Duration: 148 mins
+
+[ID: 21] Title: Inside Out 2
+Genre: Hoạt Hình
+Duration: 100 mins
+
+[ID: 22] Title: Vây Hãm: Kẻ Trừng Phạt
+Genre: Hành Động
+Duration: 109 mins
+
+[ID: 23] Title: Cửu Long Thành Trại
+Genre: Hành Động
+Duration: 126 mins
+
+[ID: 24] Title: Móng Vuốt
+Genre: Kinh Dị
+Duration: 110 mins
+
+[ID: 25] Title: Garfield: Mèo Béo Siêu Quậy
+Genre: Hoạt Hình
+Duration: 101 mins
+
+[ID: 26] Title: Bố Già
+Genre: Tâm Lý
+Duration: 128 mins
+
+[ID: 27] Title: Nhà Bà Nữ
+Genre: Tâm Lý
+Duration: 102 mins
+
+[ID: 28] Title: Avengers: Endgame
+Genre: Hành Động
+Duration: 181 mins
+
+[ID: 29] Title: Parasite: Ký Sinh Trùng
+Genre: Kịch Tính
+Duration: 132 mins
+
+[ID: 30] Title: Interstellar
+Genre: Viễn Tưởng
+Duration: 169 mins
+
+[ID: 31] Title: Titanic
+Genre: Lãng Mạn
+Duration: 195 mins
+
+
+[Mon Dec 22 19:16:46 2025] RECV: UPDATE_MOVIE id=31 new_genre="e" new_duration=0
+[Mon Dec 22 19:16:46 2025] SEND: SUCCESS: Movie updated
+[Mon Dec 22 19:20:26 2025] RECV: LOGIN username=admin password=123123
+[Mon Dec 22 19:20:26 2025] SEND: SUCCESS role=admin
+[Mon Dec 22 19:20:40 2025] RECV: UPDATE_MOVIE id=31 new_genre="" new_duration=-1
+[Mon Dec 22 19:20:40 2025] SEND: SUCCESS: Movie updated
+[Mon Dec 22 19:21:09 2025] RECV: EXIT
+[Mon Dec 22 19:21:09 2025] SEND: Goodbye! See you again.

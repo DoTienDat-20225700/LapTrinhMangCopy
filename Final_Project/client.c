@@ -190,15 +190,30 @@ void show_admin_menu(int sockfd, struct sockaddr_in *servaddr)
         { // Update Movie
             int id, new_duration;
             char new_genre[50];
+            char duration_str[20];
+
             if (!get_int("Enter Movie ID to update: ", &id))
                 continue;
 
-            printf("New Genre: ");
+            // 1. Nhập Genre mới
+            printf("New Genre (Press Enter to keep current): ");
             fgets(new_genre, sizeof(new_genre), stdin);
             new_genre[strcspn(new_genre, "\n")] = 0;
 
-            if (!get_int("New Duration: ", &new_duration))
-                continue;
+            // 2. Nhập Duration mới
+            printf("New Duration (Press Enter to keep current): ");
+            fgets(duration_str, sizeof(duration_str), stdin);
+            duration_str[strcspn(duration_str, "\n")] = 0;
+
+            // Kiểm tra: Nếu chuỗi rỗng thì gán -1 (tín hiệu không đổi), ngược lại đổi sang int
+            if (strlen(duration_str) == 0)
+            {
+                new_duration = -1;
+            }
+            else
+            {
+                new_duration = atoi(duration_str);
+            }
 
             sprintf(buffer, "UPDATE_MOVIE id=%d new_genre=\"%s\" new_duration=%d", id, new_genre, new_duration);
             break;

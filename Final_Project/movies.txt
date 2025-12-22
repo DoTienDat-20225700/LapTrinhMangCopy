@@ -1,4 +1,3 @@
--- Active: 1765652768376@@127.0.0.1@3306@expenses
 1|Nhà Ma Xó|Kinh Dị|150|Thứ 2:7h,12h,15h,20h,22h;Thứ 4:7h,12h,15h,20h,22h;Thứ 7:7h,12h,15h,20h,22h
 2|Cục Vàng Của Ngoại|Gia Đình, Tâm Lý|119|Thứ 3:7h,12h,15h,20h,22h;Thứ 4:8h,13h,16h,21h,23h
 3|Gió Vẫn Thổi|Hoạt Hình|127|Thứ 4:7h,12h,15h,20h,22h;Thứ 5:8h,13h,16h,21h,23h;Thứ 6:12h
@@ -29,4 +28,4 @@
 28|Avengers: Endgame|Hành Động|181|Thứ 2:18h;Thứ 7:14h,18h,21h
 29|Parasite: Ký Sinh Trùng|Kịch Tính|132|Thứ 4:19h;Chủ Nhật:15h,18h,21h
 30|Interstellar|Viễn Tưởng|169|Thứ 3:18h,21h;Thứ 6:19h,22h
-31|Titanic|Lãng Mạn|195|Thứ 5:18h;Chủ Nhật:13h,17h,20h
+31|Titanic|e|195|Thứ 5:18h;Chủ Nhật:13h,17h,20h

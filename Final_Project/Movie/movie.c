@@ -990,18 +990,29 @@ void handle_update_movie(const char *payload, char *out)
     int id, new_duration;
     char new_genre[50];
 
+    memset(new_genre, 0, sizeof(new_genre));
+    new_duration = -1;
+
     sscanf(payload, "UPDATE_MOVIE id=%d new_genre=\"%[^\"]\" new_duration=%d",
            &id, new_genre, &new_duration);
 
     int index = find_movie_by_id(id);
-    if (index < 0)
+    if (index == -1)
     {
         strcpy(out, "ERROR: Movie ID not found");
         return;
     }
 
-    strcpy(movie_cache[index].genre, new_genre);
-    movie_cache[index].duration = new_duration;
+    if (strlen(new_genre) > 0)
+    {
+        strcpy(movie_cache[index].genre, new_genre);
+    }
+
+    if (new_duration > 0)
+    {
+        movie_cache[index].duration = new_duration;
+    }
+
     save_all_movies("movies.txt");
 
     strcpy(out, "SUCCESS: Movie updated");
